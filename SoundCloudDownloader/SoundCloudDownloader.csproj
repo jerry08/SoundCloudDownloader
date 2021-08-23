@@ -1,0 +1,49 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net5.0-windows</TargetFramework>
+    <UseWPF>true</UseWPF>
+    <ApplicationIcon>favicon.ico</ApplicationIcon>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Remove="SoundCloudDl\SoundCloudDownloader.cs" />
+    <Compile Remove="SoundCloudDl\SoundCloudDownloader2.cs" />
+    <Compile Remove="ViewModels\RootViewModel - Copy.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Remove="favicon.ico" />
+    <None Remove="ffmpeg.exe" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="FFMpegCore" Version="4.5.0" />
+    <PackageReference Include="Gress" Version="1.2.0" />
+    <PackageReference Include="HtmlAgilityPack" Version="1.11.36" />
+    <PackageReference Include="MaterialDesignThemes" Version="4.1.0" />
+    <PackageReference Include="Microsoft.Xaml.Behaviors.Wpf" Version="1.1.31" />
+    <PackageReference Include="Onova" Version="2.6.2" />
+    <PackageReference Include="Ookii.Dialogs.Wpf" Version="3.1.0" />
+    <PackageReference Include="System.Windows.Interactivity.WPF" Version="2.0.20525" />
+    <PackageReference Include="TagLibSharp" Version="2.2.0" />
+    <PackageReference Include="Tyrrrz.Extensions" Version="1.6.5" />
+    <PackageReference Include="Tyrrrz.Settings" Version="1.3.4" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Resource Include="favicon.ico" />
+  </ItemGroup>
+
+<!-- This downloads FFmpeg and copies it to output directory-->
+  <Target Name="Download FFmpeg before build" BeforeTargets="PreBuildEvent">
+    <Exec Command="powershell -ExecutionPolicy Bypass -File &quot;$(ProjectDir)/DownloadFfmpeg.ps1&quot;" />
+    <Copy SourceFiles="$(ProjectDir)/ffmpeg.exe" DestinationFiles="$(OutDir)/ffmpeg.exe" />
+  </Target>
+
+  <Target Name="Download FFmpeg before publish" BeforeTargets="PrepareForPublish">
+    <Exec Command="powershell -ExecutionPolicy Bypass -File &quot;$(ProjectDir)/DownloadFfmpeg.ps1&quot;" />
+    <Copy SourceFiles="$(ProjectDir)/ffmpeg.exe" DestinationFiles="$(PublishDir)/ffmpeg.exe" />
+  </Target>
+</Project>

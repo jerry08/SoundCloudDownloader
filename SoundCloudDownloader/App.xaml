@@ -1,0 +1,115 @@
+﻿<Application x:Class="SoundCloudDownloader.App"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:local="clr-namespace:SoundCloudDownloader"
+             xmlns:views="clr-namespace:SoundCloudDownloader.Views"
+             xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes">
+    <Application.MainWindow>
+        <views:RootView Visibility="Visible" />
+    </Application.MainWindow>
+    <Application.Resources>
+        <!--  Merged dictionaries  -->
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <materialDesign:BundledTheme
+                    BaseTheme="Light"
+                    PrimaryColor="Blue"
+                    SecondaryColor="Blue" />
+                <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/MaterialDesignTheme.Defaults.xaml" />
+                <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/MaterialDesignTheme.ProgressBar.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
+
+            <Color x:Key="SuccessColor">#006400</Color>
+            <Color x:Key="CanceledColor">#FF8C00</Color>
+            <Color x:Key="FailedColor">#8B0000</Color>
+
+            <SolidColorBrush x:Key="SuccessBrush" Color="{DynamicResource SuccessColor}" />
+            <SolidColorBrush x:Key="CanceledBrush" Color="{DynamicResource CanceledColor}" />
+            <SolidColorBrush x:Key="FailedBrush" Color="{DynamicResource FailedColor}" />
+            <!--  Styles  -->
+            <Style x:Key="MaterialDesignRoot" TargetType="{x:Type Control}">
+                <Setter Property="FontFamily" Value="{DynamicResource MaterialDesignFont}" />
+                <Setter Property="RenderOptions.BitmapScalingMode" Value="HighQuality" />
+                <Setter Property="SnapsToDevicePixels" Value="True" />
+                <Setter Property="TextElement.FontSize" Value="13" />
+                <Setter Property="TextElement.FontWeight" Value="Regular" />
+                <Setter Property="TextElement.Foreground" Value="{DynamicResource MaterialDesignBody}" />
+                <Setter Property="TextOptions.TextFormattingMode" Value="Ideal" />
+                <Setter Property="TextOptions.TextRenderingMode" Value="Auto" />
+                <Setter Property="UseLayoutRounding" Value="True" />
+            </Style>
+
+            <Style BasedOn="{StaticResource MaterialDesignScrollBarMinimal}" TargetType="{x:Type ScrollBar}" />
+
+            <Style BasedOn="{StaticResource MaterialDesignLinearProgressBar}" TargetType="{x:Type ProgressBar}">
+                <Setter Property="BorderThickness" Value="0" />
+                <Setter Property="Foreground" Value="{DynamicResource SecondaryHueMidBrush}" />
+                <Setter Property="Background" Value="Transparent" />
+                <Setter Property="Height" Value="2" />
+                <Setter Property="Maximum" Value="1" />
+                <Setter Property="Minimum" Value="0" />
+            </Style>
+
+            <Style BasedOn="{StaticResource MaterialDesignTextBox}" TargetType="{x:Type TextBox}" />
+
+            <Style BasedOn="{StaticResource MaterialDesignComboBox}" TargetType="{x:Type ComboBox}" />
+
+            <Style BasedOn="{StaticResource MaterialDesignDataGrid}" TargetType="{x:Type DataGrid}">
+                <Setter Property="AutoGenerateColumns" Value="False" />
+                <Setter Property="CanUserAddRows" Value="False" />
+                <Setter Property="CanUserDeleteRows" Value="False" />
+                <Setter Property="CanUserReorderColumns" Value="True" />
+                <Setter Property="CanUserResizeColumns" Value="True" />
+                <Setter Property="CanUserSortColumns" Value="True" />
+                <Setter Property="IsReadOnly" Value="True" />
+                <Setter Property="SelectionMode" Value="Single" />
+                <Setter Property="SelectionUnit" Value="FullRow" />
+            </Style>
+
+            <Style BasedOn="{StaticResource MaterialDesignDataGridRow}" TargetType="{x:Type DataGridRow}">
+                <Setter Property="FocusVisualStyle" Value="{x:Null}" />
+            </Style>
+
+            <Style BasedOn="{StaticResource MaterialDesignDataGridCell}" TargetType="{x:Type DataGridCell}">
+                <Setter Property="FocusVisualStyle" Value="{x:Null}" />
+                <Style.Triggers>
+                    <Trigger Property="IsSelected" Value="True">
+                        <Setter Property="Background" Value="{x:Null}" />
+                        <Setter Property="BorderBrush" Value="{x:Null}" />
+                    </Trigger>
+                </Style.Triggers>
+            </Style>
+
+            <Style
+                x:Key="MaterialDesignFlatDarkButton"
+                BasedOn="{StaticResource MaterialDesignFlatButton}"
+                TargetType="{x:Type Button}">
+                <Style.Resources>
+                    <SolidColorBrush x:Key="MaterialDesignFlatButtonClick" Color="#4C4C4C" />
+                </Style.Resources>
+
+                <Setter Property="Foreground" Value="{DynamicResource PrimaryHueMidForegroundBrush}" />
+            </Style>
+
+            <Style TargetType="{x:Type materialDesign:Snackbar}">
+                <Setter Property="Background" Value="{DynamicResource MaterialDesignDarkBackground}" />
+                <Setter Property="Foreground" Value="{DynamicResource MaterialDesignDarkForeground}" />
+                <Setter Property="VerticalContentAlignment" Value="Center" />
+                <Setter Property="ActionButtonStyle">
+                    <Setter.Value>
+                        <Style BasedOn="{StaticResource MaterialDesignFlatButton}" TargetType="{x:Type Button}">
+                            <Setter Property="VerticalAlignment" Value="Stretch" />
+                            <Setter Property="HorizontalContentAlignment" Value="Center" />
+                            <Setter Property="VerticalContentAlignment" Value="Center" />
+                            <Setter Property="Height" Value="36" />
+                            <Setter Property="Margin" Value="8,-10,-8,-10" />
+                            <Setter Property="Padding" Value="8" />
+                            <Setter Property="Foreground" Value="{DynamicResource SecondaryHueMidBrush}" />
+                            <Setter Property="materialDesign:RippleAssist.Feedback" Value="{DynamicResource MaterialDesignSnackbarRipple}" />
+                        </Style>
+                    </Setter.Value>
+                </Setter>
+            </Style>
+        </ResourceDictionary>
+    </Application.Resources>
+</Application>

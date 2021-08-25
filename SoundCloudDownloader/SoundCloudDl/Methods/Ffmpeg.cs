@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Net;
 using System.Threading.Tasks;
 
 using FFMpegCore;
@@ -34,6 +35,18 @@ namespace SoundCloudDl.Methods
             {
                 case ".mp3":
                     audioCodec = AudioCodec.LibMp3Lame;
+
+                    //WebClient client = new WebClient();
+                    //client.DownloadProgressChanged += (s, e) =>
+                    //{
+                    //    if (e.ProgressPercentage <= 100)
+                    //    {
+                    //        progress.Report(e.ProgressPercentage / 100);
+                    //    }
+                    //};
+                    //await client.DownloadFileTaskAsync(trackMediaUrl, trackFilePath);
+                    //return;
+
                     break;
                 case ".ogg":
                     audioCodec = AudioCodec.LibVorbis;

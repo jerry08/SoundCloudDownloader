@@ -71,6 +71,16 @@ namespace SoundCloudDownloader.ViewModels
             }
         }
 
+        private ICommand _onViewLoadedCommand;
+        public ICommand OnViewLoadedCommand
+        {
+            get
+            {
+                return _onViewLoadedCommand ??
+                    (_onViewLoadedCommand = new CommandHandler((s) => OnViewLoaded(), () => true));
+            }
+        }
+
         public bool CanExecute
         {
             get
@@ -102,12 +112,12 @@ namespace SoundCloudDownloader.ViewModels
 
                 OnPropertyChanged(null);
             };
+
+            App.Current.MainWindow.Closing += delegate { OnClose(); };
         }
 
         private async Task CheckForUpdatesAsync()
         {
-            return;
-
             try
             {
                 // Check for updates
@@ -128,7 +138,7 @@ namespace SoundCloudDownloader.ViewModels
                         if (MessageBox.Show("Do you want to install it now?", "Confirmation", MessageBoxButton.YesNo, MessageBoxImage.Information)
                             == MessageBoxResult.Yes)
                         {
-                            App.Current.Shutdown();
+                            App.Current.MainWindow.Close();
                         }
                     });
             }
@@ -139,10 +149,21 @@ namespace SoundCloudDownloader.ViewModels
             }
         }
 
+        public void OnClose()
+        {
+            _settingsService.Save();
+
+            // Cancel all downloads
+            foreach (var download in Downloads)
+                download.Cancel();
+
+            _updateService.FinalizeUpdate(false);
+        }
+
         void ShowSettings()
         {
-            var window = new SettingsView();
-            window.ShowDialog();
+            //var window = new SettingsView();
+            //window.ShowDialog();
         }
 
         public async void OnViewLoaded()

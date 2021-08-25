@@ -19,7 +19,7 @@ namespace SoundCloudDownloader
 
         public static string VersionString { get; } = Version.ToString(3);
 
-        public static string GitHubProjectUrl { get; } = "https://github.com/Tyrrrz/SoundCloudDownloader";
+        public static string GitHubProjectUrl { get; } = "https://github.com/Code-08/SoundCloudDownloader";
     }
 
     public partial class App

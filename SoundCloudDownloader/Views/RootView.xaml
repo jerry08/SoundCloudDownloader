@@ -3,6 +3,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:i="clr-namespace:System.Windows.Interactivity;assembly=System.Windows.Interactivity"
         xmlns:local="clr-namespace:SoundCloudDownloader.Views"
         xmlns:viewModels="clr-namespace:SoundCloudDownloader.ViewModels"
         mc:Ignorable="d"
@@ -14,7 +15,7 @@
         Icon="/SoundCloudDownloader;component/favicon.ico"
         Style="{DynamicResource MaterialDesignRoot}"
         WindowStartupLocation="CenterScreen"
-        Title="RootView">
+        Title="{Binding DisplayName}">
     <Window.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
@@ -29,6 +30,11 @@
     <Window.DataContext>
         <viewModels:RootViewModel />
     </Window.DataContext>
+    <i:Interaction.Triggers>
+        <i:EventTrigger EventName="Loaded">
+            <i:InvokeCommandAction Command="{Binding OnViewLoadedCommand}" />
+        </i:EventTrigger>
+    </i:Interaction.Triggers>
     <materialDesign:DialogHost
         CloseOnClickAway="True"
         SnackbarMessageQueue="{Binding Notifications}"

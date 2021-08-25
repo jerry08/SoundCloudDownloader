@@ -9,7 +9,7 @@ namespace SoundCloudDownloader.Services
     public class UpdateService : IDisposable
     {
         private readonly IUpdateManager _updateManager = new UpdateManager(
-            new GithubPackageResolver("Tyrrrz", "SoundCloudDownloader", "SoundCloudDownloader.zip"),
+            new GithubPackageResolver("Code-08", "SoundCloudDownloader", "SoundCloudDownloader.zip"),
             new ZipPackageExtractor()
         );
 

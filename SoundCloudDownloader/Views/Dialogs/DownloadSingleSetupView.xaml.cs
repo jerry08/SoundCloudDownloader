@@ -1,8 +1,8 @@
 ﻿namespace SoundCloudDownloader.Views.Dialogs;
 
-public partial class MessageBoxView
+public partial class DownloadSingleSetupView
 {
-    public MessageBoxView()
+    public DownloadSingleSetupView()
     {
         InitializeComponent();
     }

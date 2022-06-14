@@ -1,9 +1,8 @@
 ﻿using System.Windows.Media;
 
-namespace SoundCloudDownloader.Utils
+namespace SoundCloudDownloader.Utils;
+
+internal static class MediaColor
 {
-    internal static class MediaColor
-    {
-        public static Color FromHex(string hex) => (Color) ColorConverter.ConvertFromString(hex);
-    }
+    public static Color FromHex(string hex) => (Color) ColorConverter.ConvertFromString(hex);
 }

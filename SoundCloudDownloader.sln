@@ -1,9 +1,20 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 16
-VisualStudioVersion = 16.0.31402.337
+# Visual Studio Version 17
+VisualStudioVersion = 17.2.32505.173
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SoundCloudDownloader", "SoundCloudDownloader\SoundCloudDownloader.csproj", "{43473513-7407-4C57-B79F-5A9441ECA77D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SoundCloudDownloader", "SoundCloudDownloader\SoundCloudDownloader.csproj", "{43473513-7407-4C57-B79F-5A9441ECA77D}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{7E599521-602C-4999-8957-BC82992BB463}"
+	ProjectSection(SolutionItems) = preProject
+		.gitattributes = .gitattributes
+		.gitignore = .gitignore
+		Directory.Build.props = Directory.Build.props
+		favicon.ico = favicon.ico
+		README.md = README.md
+	EndProjectSection
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SoundCloudDownloader.Core", "SoundCloudDownloader.Core\SoundCloudDownloader.Core.csproj", "{98182EC2-A529-49E3-A0E8-E9E4DD8BDA73}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,6 +26,10 @@ Global
 		{43473513-7407-4C57-B79F-5A9441ECA77D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{43473513-7407-4C57-B79F-5A9441ECA77D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{43473513-7407-4C57-B79F-5A9441ECA77D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{98182EC2-A529-49E3-A0E8-E9E4DD8BDA73}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{98182EC2-A529-49E3-A0E8-E9E4DD8BDA73}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{98182EC2-A529-49E3-A0E8-E9E4DD8BDA73}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{98182EC2-A529-49E3-A0E8-E9E4DD8BDA73}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -1,174 +1,113 @@
-﻿using Gress;
-using SoundCloudDl.Models.SoundCloud;
-using SoundCloudDownloader.Common;
-using SoundCloudDownloader.Services;
-using SoundCloudDownloader.Utils;
-using System;
-using System.Collections.Generic;
-using System.Diagnostics;
+﻿using System;
 using System.IO;
-using System.Linq;
-using System.Text;
 using System.Threading;
-using System.Threading.Tasks;
-using System.Windows.Input;
+using Gress;
+using Stylet;
+using SoundCloudDownloader.Core.Downloading;
+using SoundCloudDownloader.Utils;
+using SoundCloudDownloader.ViewModels.Dialogs;
+using SoundCloudDownloader.ViewModels.Framework;
+using SoundCloudExplode.Track;
 
-namespace SoundCloudDownloader.ViewModels.Components
+namespace SoundCloudDownloader.ViewModels.Components;
+
+public class DownloadViewModel : PropertyChangedBase, IDisposable
 {
-    public class DownloadViewModel : PropertyChangedBase
+    private readonly IViewModelFactory _viewModelFactory;
+    private readonly DialogManager _dialogManager;
+
+    private readonly CancellationTokenSource _cancellationTokenSource = new();
+
+    public TrackInformation? Track { get; set; }
+
+    public string? FilePath { get; set; }
+
+    public string? FileName => Path.GetFileName(FilePath);
+
+    public ProgressContainer<Percentage> Progress { get; } = new();
+
+    public bool IsProgressIndeterminate => Progress.Current.Fraction is <= 0 or >= 1;
+
+    public CancellationToken CancellationToken => _cancellationTokenSource.Token;
+
+    public DownloadStatus Status { get; set; } = DownloadStatus.Enqueued;
+
+    public bool IsCanceledOrFailed => Status is DownloadStatus.Canceled or DownloadStatus.Failed;
+
+    public string? ErrorMessage { get; set; }
+
+    public DownloadViewModel(IViewModelFactory viewModelFactory, DialogManager dialogManager)
     {
-        public string ClientId { get; set; }
+        _viewModelFactory = viewModelFactory;
+        _dialogManager = dialogManager;
 
-        private DownloadService _downloadService = new DownloadService();
+        Progress.Bind(o => o.Current, (_, _) => NotifyOfPropertyChange(() => IsProgressIndeterminate));
+    }
 
-        private CancellationTokenSource _cancellationTokenSource;
+    public bool CanCancel => Status is DownloadStatus.Enqueued or DownloadStatus.Started;
 
-        public TrackInformation Track { get; set; } = default!;
+    public void Cancel()
+    {
+        if (!CanCancel)
+            return;
 
-        public string FilePath { get; set; } = default!;
+        _cancellationTokenSource.Cancel();
+    }
 
-        public string FileName => Path.GetFileName(FilePath);
+    public bool CanShowFile => Status == DownloadStatus.Completed;
 
-        public string Format { get; set; } = default!;
+    public async void ShowFile()
+    {
+        if (!CanShowFile)
+            return;
 
-        public IProgressManager ProgressManager { get; set; }
-
-        public IProgressOperation ProgressOperation { get; private set; }
-
-        public bool IsActive { get; private set; }
-
-        public bool IsSuccessful { get; private set; }
-
-        public bool IsCanceled { get; private set; }
-
-        public bool IsFailed { get; private set; }
-
-        public string FailReason { get; private set; }
-
-        public bool CanStart => !IsActive;
-
-        public void Start()
+        try
         {
-            if (!CanStart)
-                return;
-
-            IsActive = true;
-            IsSuccessful = false;
-            IsCanceled = false;
-            IsFailed = false;
-
-            Task.Run(async () =>
-            {
-                _cancellationTokenSource = new CancellationTokenSource();
-                ProgressOperation = ProgressManager?.CreateOperation();
-
-                try
-                {
-                    //Download
-                    await _downloadService.DownloadAsync(Track,
-                        ClientId, FilePath, ProgressOperation, _cancellationTokenSource.Token);
-
-                    IsSuccessful = true;
-                }
-                catch (OperationCanceledException)
-                {
-                    IsCanceled = true;
-                }
-                catch (Exception ex)
-                {
-                    IsFailed = true;
-
-                    FailReason = ex.Message;
-                }
-                finally
-                {
-                    IsActive = false;
-                    _cancellationTokenSource?.Dispose();
-                    _cancellationTokenSource = null;
-                    ProgressOperation?.Dispose();
-
-                    //Update "IsSuccessful" property
-                    //OnPropertyChanged(nameof(IsSuccessful));
-
-                    //Update all properties
-                    OnPropertyChanged(null);
-                }
-            });
+            // Navigate to the file in Windows Explorer
+            ProcessEx.Start("explorer", new[] { "/select,", FilePath! });
         }
-
-        private ICommand _cancelCommand;
-        public ICommand CancelCommand
+        catch (Exception ex)
         {
-            get
-            {
-                return _cancelCommand ??
-                    (_cancelCommand = new CommandHandler((s) => Cancel(), () => CanCancel));
-            }
+            await _dialogManager.ShowDialogAsync(
+                _viewModelFactory.CreateMessageBoxViewModel("Error", ex.Message)
+            );
         }
+    }
 
-        public bool CanCancel => IsActive && !IsCanceled;
+    public bool CanOpenFile => Status == DownloadStatus.Completed;
 
-        public void Cancel()
+    public async void OpenFile()
+    {
+        if (!CanOpenFile)
+            return;
+
+        try
         {
-            if (!CanCancel)
-                return;
-
-            _cancellationTokenSource?.Cancel();
+            ProcessEx.StartShellExecute(FilePath!);
         }
-
-        private ICommand _showFileCommand;
-        public ICommand ShowFileCommand
+        catch (Exception ex)
         {
-            get
-            {
-                return _showFileCommand ??
-                    (_showFileCommand = new CommandHandler((s) => ShowFile(), () => CanShowFile));
-            }
+            await _dialogManager.ShowDialogAsync(
+                _viewModelFactory.CreateMessageBoxViewModel("Error", ex.Message)
+            );
         }
+    }
 
-        public bool CanShowFile => IsSuccessful;
+    public void Dispose() => _cancellationTokenSource.Dispose();
+}
 
-        public void ShowFile()
-        {
-            if (!CanShowFile)
-                return;
+public static class DownloadViewModelExtensions
+{
+    public static DownloadViewModel CreateDownloadViewModel(
+        this IViewModelFactory factory,
+        TrackInformation track,
+        string filePath)
+    {
+        var viewModel = factory.CreateDownloadViewModel();
 
-            // Open explorer, navigate to the output directory and select the file
-            Process.Start("explorer", $"/select, \"{FilePath}\"");
-        }
+        viewModel.Track = track;
+        viewModel.FilePath = filePath;
 
-        private ICommand _openFileCommand;
-        public ICommand OpenFileCommand
-        {
-            get
-            {
-                return _openFileCommand ??
-                    (_openFileCommand = new CommandHandler((s) => OpenFile(), () => CanOpenFile));
-            }
-        }
-
-        public bool CanOpenFile => IsSuccessful;
-
-        public void OpenFile()
-        {
-            if (!CanOpenFile)
-                return;
-
-            ProcessEx.StartShellExecute(FilePath);
-        }
-
-        private ICommand _restartCommand;
-        public ICommand RestartCommand
-        {
-            get
-            {
-                return _restartCommand ??
-                    (_restartCommand = new CommandHandler((s) => Restart(), () => CanRestart));
-            }
-        }
-
-        public bool CanRestart => CanStart && !IsSuccessful;
-
-        public void Restart() => Start();
+        return viewModel;
     }
 }

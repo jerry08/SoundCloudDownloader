@@ -1,11 +1,10 @@
-﻿using MaterialDesignThemes.Wpf;
-using SoundCloudDownloader.Utils;
-using System;
-using System.Net;
+﻿using System;
 using System.Reflection;
 using System.Windows;
 using System.Windows.Media;
+using MaterialDesignThemes.Wpf;
 using System.Windows.Threading;
+using SoundCloudDownloader.Utils;
 
 namespace SoundCloudDownloader
 {
@@ -19,7 +18,7 @@ namespace SoundCloudDownloader
 
         public static string VersionString { get; } = Version.ToString(3);
 
-        public static string GitHubProjectUrl { get; } = "https://github.com/Code-08/SoundCloudDownloader";
+        public static string GitHubProjectUrl { get; } = "https://github.com/jerry08/SoundCloudDownloader";
     }
 
     public partial class App
@@ -27,13 +26,6 @@ namespace SoundCloudDownloader
         protected override void OnStartup(StartupEventArgs e)
         {
             base.OnStartup(e);
-
-            // Set default theme
-            // (preferred theme will be chosen later, once the settings are loaded)
-            App.SetLightTheme();
-
-            // Increase maximum concurrent connections
-            ServicePointManager.DefaultConnectionLimit = 20;
 
             Current.DispatcherUnhandledException += Current_DispatcherUnhandledException;
         }

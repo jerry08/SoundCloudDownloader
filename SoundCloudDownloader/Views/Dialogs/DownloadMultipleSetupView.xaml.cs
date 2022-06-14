@@ -1,10 +1,9 @@
-﻿namespace SoundCloudDownloader.Views.Dialogs
+﻿namespace SoundCloudDownloader.Views.Dialogs;
+
+public partial class DownloadMultipleSetupView
 {
-    public partial class DownloadMultipleSetupView
+    public DownloadMultipleSetupView()
     {
-        public DownloadMultipleSetupView()
-        {
-            InitializeComponent();
-        }
+        InitializeComponent();
     }
 }

@@ -1,7 +1,6 @@
 ﻿# SoundCloudDownloader
 
-[![Made in Guyana](https://img.shields.io/badge/made_in-guyana-ffd700.svg?labelColor=0057b7)]
-[![Build](https://img.shields.io/github/workflow/status/jerry08/SoundCloudDownloader/main/master)](https://github.com/jerry08/SoundCloudDownloader/actions)
+![Made in Guyana](https://img.shields.io/badge/made_in-guyana-ffd700.svg?labelColor=0057b7)
 [![Release](https://img.shields.io/github/release/jerry08/SoundCloudDownloader.svg)](https://github.com/jerry08/SoundCloudDownloader/releases)
 
 > 🟡 **Project status**: maintenance mode

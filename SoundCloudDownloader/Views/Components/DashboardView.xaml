@@ -173,7 +173,8 @@
                 <!--  Columns  -->
                 <DataGrid.Columns>
                     <!--  Thumbnail  -->
-                    <DataGridTemplateColumn>
+                    <DataGridTemplateColumn
+                        Width="*">
                         <DataGridTemplateColumn.CellTemplate>
                             <DataTemplate DataType="{x:Type components:DownloadViewModel}">
                                 <Image

@@ -39,7 +39,7 @@ public class QueryResolver
         if (isUrl && TrackRegex.IsMatch(query))
         {
             var track = await _soundcloud.GetTrackAsync(query, cancellationToken);
-            return new QueryResult(QueryResultKind.Track, track.Title, new[] { track });
+            return new QueryResult(QueryResultKind.Track, track.Title!, new[] { track });
         }
 
         // Default

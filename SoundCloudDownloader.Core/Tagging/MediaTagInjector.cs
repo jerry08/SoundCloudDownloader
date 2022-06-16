@@ -30,13 +30,13 @@ public class MediaTagInjector
         TrackInformation track,
         CancellationToken cancellationToken = default)
     {
-        var recordings = await _musicBrainz.SearchRecordingsAsync(track.Title, cancellationToken);
+        var recordings = await _musicBrainz.SearchRecordingsAsync(track.Title!, cancellationToken);
 
         var recording = recordings
             .FirstOrDefault(r =>
                 // Recording title must be part of the track title.
                 // Recording artist must be part of the track title.
-                track.Title.Contains(r.Title, StringComparison.OrdinalIgnoreCase) && (
+                track.Title!.Contains(r.Title, StringComparison.OrdinalIgnoreCase) && (
                     track.Title.Contains(r.Artist, StringComparison.OrdinalIgnoreCase)
                 )
             );
@@ -58,9 +58,9 @@ public class MediaTagInjector
         MediaFile mediaFile,
         TrackInformation track)
     {
-        mediaFile.SetTitle(track.Title);
-        mediaFile.SetPerformers(new[] { track.User.Username });
-        mediaFile.SetAlbum(track.User.Username);
+        mediaFile.SetTitle(track.Title!);
+        mediaFile.SetPerformers(new[] { track.User!.Username! });
+        mediaFile.SetAlbum(track.User.Username!);
     }
 
     private async Task InjectThumbnailAsync(

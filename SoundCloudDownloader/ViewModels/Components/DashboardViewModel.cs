@@ -12,7 +12,7 @@ using SoundCloudDownloader.Services;
 using SoundCloudDownloader.Utils;
 using SoundCloudDownloader.ViewModels.Dialogs;
 using SoundCloudDownloader.ViewModels.Framework;
-using SoundCloudDownloader.Exceptions;
+using SoundCloudExplode.Exceptions;
 
 namespace SoundCloudDownloader.ViewModels.Components;
 

@@ -114,7 +114,7 @@ public class DashboardViewModel : PropertyChangedBase
                     : DownloadStatus.Failed;
 
                 // Short error message for SoundCloud-related errors, full for others
-                download.ErrorMessage = ex is SoundCloudExplodeException
+                download.ErrorMessage = ex is SoundcloudExplodeException
                     ? ex.Message
                     : ex.ToString();
             }
@@ -195,7 +195,7 @@ public class DashboardViewModel : PropertyChangedBase
                 _viewModelFactory.CreateMessageBoxViewModel(
                     "Error",
                     // Short error message for SoundCloud-related errors, full for others
-                    ex is SoundCloudExplodeException
+                    ex is SoundcloudExplodeException
                         ? ex.Message
                         : ex.ToString()
                 )

@@ -68,8 +68,10 @@ public class MediaTagInjector
         TrackInformation track,
         CancellationToken cancellationToken = default)
     {
+        var url = track.ArtworkUrl!.ToString().Replace("large", "t500x500").Replace("small", "t500x500");
+
         mediaFile.SetThumbnail(
-            await Http.Client.GetByteArrayAsync(track.ArtworkUrl, cancellationToken)
+            await Http.Client.GetByteArrayAsync(url, cancellationToken)
         );
     }
 

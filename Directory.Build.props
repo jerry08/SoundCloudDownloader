@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <TargetFramework>net5.0-windows</TargetFramework>
-    <Version>1.4.1</Version>
+    <Version>1.4.2</Version>
     <Company>Jero</Company>
     <Copyright>Copyright (C) Jero</Copyright>
     <LangVersion>preview</LangVersion>

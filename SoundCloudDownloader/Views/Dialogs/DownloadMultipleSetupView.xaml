@@ -114,8 +114,8 @@
                                             Margin="3,0,0,0"
                                             VerticalAlignment="Center"
                                             FontWeight="Light"
-                                            Text="{Binding Duration, TargetNullValue=Live}"
-                                            TextTrimming="CharacterEllipsis" />
+                                            Text="{Binding Duration, TargetNullValue=Live, Converter={x:Static converters:TrackDurationToHumanReadableFormatConverter.Instance}, Mode=OneWay}"
+                                            TextTrimming="None" />
                                     </StackPanel>
                                 </StackPanel>
                             </StackPanel>

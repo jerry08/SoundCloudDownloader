@@ -48,6 +48,7 @@
                         Margin="3,0,0,0"
                         VerticalAlignment="Center"
                         FontWeight="Light"
+                        Width="340"
                         Text="{Binding Track.Title}"
                         TextTrimming="CharacterEllipsis" />
                 </StackPanel>
@@ -64,8 +65,8 @@
                         Margin="3,0,0,0"
                         VerticalAlignment="Center"
                         FontWeight="Light"
-                        Text="{Binding Track.Duration, TargetNullValue=Live}"
-                        TextTrimming="CharacterEllipsis" />
+                        Text="{Binding Track.Duration, TargetNullValue=Live, Converter={x:Static converters:TrackDurationToHumanReadableFormatConverter.Instance}, Mode=OneWay}"
+                        TextTrimming="None" />
                 </StackPanel>
             </StackPanel>
         </StackPanel>

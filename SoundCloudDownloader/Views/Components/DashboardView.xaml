@@ -3,7 +3,6 @@
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:components="clr-namespace:SoundCloudDownloader.ViewModels.Components"
-    xmlns:converters="clr-namespace:SoundCloudDownloader.Converters"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
@@ -11,6 +10,11 @@
     d:DataContext="{d:DesignInstance Type=components:DashboardViewModel}"
     FocusManager.FocusedElement="{Binding ElementName=QueryTextBox}"
     mc:Ignorable="d">
+    <UserControl.Resources>
+        <ResourceDictionary>
+            <s:BoolToVisibilityConverter x:Key="BoolToVisibilityConverter" FalseVisibility="Hidden" />
+        </ResourceDictionary>
+    </UserControl.Resources>
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
@@ -143,7 +147,9 @@
                 ItemsSource="{Binding Downloads}"
                 ScrollViewer.CanContentScroll="False"
                 VerticalScrollBarVisibility="Auto"
-                Visibility="{Binding Downloads.Count, Converter={x:Static s:BoolToVisibilityConverter.Instance}}">
+                Visibility="{Binding Downloads.Count, Converter={StaticResource BoolToVisibilityConverter}}">
+                <!-- Fix bug that causes track info to not show when downloading. Removed line below -->
+                <!--Visibility="{Binding Downloads.Count, Converter={x:Static s:BoolToVisibilityConverter.Instance}}"-->
                 <DataGrid.ContextMenu>
                     <ContextMenu>
                         <MenuItem Command="{s:Action RemoveSuccessfulDownloads}" Header="Remove successful downloads" />

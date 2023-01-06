@@ -21,8 +21,8 @@ public class QueryResolver
         // Playlist
         if (_soundcloud.Playlists.IsUrlValid(query))
         {
-            var playlist = await _soundcloud.Playlists.GetAsync(query, true, cancellationToken);
-            var tracks = await _soundcloud.Playlists.GetTracksAsync(query, cancellationToken: cancellationToken);
+            var playlist = await _soundcloud.Playlists.GetAsync(query, cancellationToken);
+            var tracks = await _soundcloud.Playlists.GetTracksAsync(query, cancellationToken);
             return new QueryResult(QueryResultKind.Playlist, $"Playlist: {playlist!.Title}", tracks);
         }
 

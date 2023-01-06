@@ -1,21 +1,22 @@
 ﻿using System;
 using Stylet;
 
-namespace SoundCloudDownloader.ViewModels.Framework;
-
-public abstract class DialogScreen<T> : PropertyChangedBase
+namespace SoundCloudDownloader.ViewModels.Framework
 {
-    public T? DialogResult { get; private set; }
-
-    public event EventHandler? Closed;
-
-    public virtual void Close(T? dialogResult = default)
+    public abstract class DialogScreen<T> : PropertyChangedBase
     {
-        DialogResult = dialogResult;
-        Closed?.Invoke(this, EventArgs.Empty);
-    }
-}
+        public T? DialogResult { get; private set; }
 
-public abstract class DialogScreen : DialogScreen<bool?>
-{
+        public event EventHandler? Closed;
+
+        public virtual void Close(T? dialogResult = default)
+        {
+            DialogResult = dialogResult;
+            Closed?.Invoke(this, EventArgs.Empty);
+        }
+    }
+
+    public abstract class DialogScreen : DialogScreen<bool?>
+    {
+    }
 }

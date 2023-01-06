@@ -6,66 +6,67 @@ using MaterialDesignThemes.Wpf;
 using System.Windows.Threading;
 using SoundCloudDownloader.Utils;
 
-namespace SoundCloudDownloader;
-
-public partial class App
+namespace SoundCloudDownloader
 {
-    private static Assembly Assembly { get; } = typeof(App).Assembly;
-
-    public static string Name { get; } = Assembly.GetName().Name!;
-
-    public static Version Version { get; } = Assembly.GetName().Version!;
-
-    public static string VersionString { get; } = Version.ToString(3);
-
-    public static string GitHubProjectUrl { get; } = "https://github.com/jerry08/SoundCloudDownloader";
-}
-
-public partial class App
-{
-    protected override void OnStartup(StartupEventArgs e)
+    public partial class App
     {
-        base.OnStartup(e);
+        private static Assembly Assembly { get; } = typeof(App).Assembly;
 
-        Current.DispatcherUnhandledException += Current_DispatcherUnhandledException;
+        public static string Name { get; } = Assembly.GetName().Name!;
+
+        public static Version Version { get; } = Assembly.GetName().Version!;
+
+        public static string VersionString { get; } = Version.ToString(3);
+
+        public static string GitHubProjectUrl { get; } = "https://github.com/jerry08/SoundCloudDownloader";
     }
 
-    private static Theme LightTheme { get; } = Theme.Create(
-        new MaterialDesignLightTheme(),
-        MediaColor.FromHex("#343838"),
-        MediaColor.FromHex("#F9A825")
-    );
-
-    private static Theme DarkTheme { get; } = Theme.Create(
-        new MaterialDesignDarkTheme(),
-        MediaColor.FromHex("#E8E8E8"),
-        MediaColor.FromHex("#F9A825")
-    );
-
-    public static void SetLightTheme()
+    public partial class App
     {
-        var paletteHelper = new PaletteHelper();
-        paletteHelper.SetTheme(LightTheme);
+        protected override void OnStartup(StartupEventArgs e)
+        {
+            base.OnStartup(e);
 
-        Current.Resources["SuccessBrush"] = new SolidColorBrush(Colors.DarkGreen);
-        Current.Resources["CanceledBrush"] = new SolidColorBrush(Colors.DarkOrange);
-        Current.Resources["FailedBrush"] = new SolidColorBrush(Colors.DarkRed);
-    }
+            Current.DispatcherUnhandledException += Current_DispatcherUnhandledException;
+        }
 
-    public static void SetDarkTheme()
-    {
-        var paletteHelper = new PaletteHelper();
-        paletteHelper.SetTheme(DarkTheme);
+        private static Theme LightTheme { get; } = Theme.Create(
+            new MaterialDesignLightTheme(),
+            MediaColor.FromHex("#343838"),
+            MediaColor.FromHex("#F9A825")
+        );
 
-        Current.Resources["SuccessBrush"] = new SolidColorBrush(Colors.LightGreen);
-        Current.Resources["CanceledBrush"] = new SolidColorBrush(Colors.Orange);
-        Current.Resources["FailedBrush"] = new SolidColorBrush(Colors.OrangeRed);
-    }
+        private static Theme DarkTheme { get; } = Theme.Create(
+            new MaterialDesignDarkTheme(),
+            MediaColor.FromHex("#E8E8E8"),
+            MediaColor.FromHex("#F9A825")
+        );
 
-    void Current_DispatcherUnhandledException(object sender, DispatcherUnhandledExceptionEventArgs e)
-    {
-        e.Handled = true;
+        public static void SetLightTheme()
+        {
+            var paletteHelper = new PaletteHelper();
+            paletteHelper.SetTheme(LightTheme);
 
-        MessageBox.Show(e.Exception.GetBaseException().Message, "Error!", MessageBoxButton.OK, MessageBoxImage.Error);
+            Current.Resources["SuccessBrush"] = new SolidColorBrush(Colors.DarkGreen);
+            Current.Resources["CanceledBrush"] = new SolidColorBrush(Colors.DarkOrange);
+            Current.Resources["FailedBrush"] = new SolidColorBrush(Colors.DarkRed);
+        }
+
+        public static void SetDarkTheme()
+        {
+            var paletteHelper = new PaletteHelper();
+            paletteHelper.SetTheme(DarkTheme);
+
+            Current.Resources["SuccessBrush"] = new SolidColorBrush(Colors.LightGreen);
+            Current.Resources["CanceledBrush"] = new SolidColorBrush(Colors.Orange);
+            Current.Resources["FailedBrush"] = new SolidColorBrush(Colors.OrangeRed);
+        }
+
+        void Current_DispatcherUnhandledException(object sender, DispatcherUnhandledExceptionEventArgs e)
+        {
+            e.Handled = true;
+
+            MessageBox.Show(e.Exception.GetBaseException().Message, "Error!", MessageBoxButton.OK, MessageBoxImage.Error);
+        }
     }
 }

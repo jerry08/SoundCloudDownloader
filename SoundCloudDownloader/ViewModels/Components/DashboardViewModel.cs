@@ -147,6 +147,9 @@ public class DashboardViewModel : PropertyChangedBase
                 progress
             );
 
+            foreach (var track in result.Tracks)
+                track.ArtworkUrl ??= track.User?.AvatarUrl;
+
             // Single track
             if (result.Tracks.Count == 1)
             {

@@ -1,21 +1,20 @@
 ﻿using SoundCloudDownloader.ViewModels.Components;
 using SoundCloudDownloader.ViewModels.Dialogs;
 
-namespace SoundCloudDownloader.ViewModels.Framework
+namespace SoundCloudDownloader.ViewModels.Framework;
+
+// Used to instantiate new view models while making use of dependency injection
+public interface IViewModelFactory
 {
-    // Used to instantiate new view models while making use of dependency injection
-    public interface IViewModelFactory
-    {
-        DashboardViewModel CreateDashboardViewModel();
+    DashboardViewModel CreateDashboardViewModel();
 
-        DownloadViewModel CreateDownloadViewModel();
+    DownloadViewModel CreateDownloadViewModel();
 
-        DownloadSingleSetupViewModel CreateDownloadSingleSetupViewModel();
+    DownloadSingleSetupViewModel CreateDownloadSingleSetupViewModel();
 
-        DownloadMultipleSetupViewModel CreateDownloadMultipleSetupViewModel();
+    DownloadMultipleSetupViewModel CreateDownloadMultipleSetupViewModel();
 
-        MessageBoxViewModel CreateMessageBoxViewModel();
+    MessageBoxViewModel CreateMessageBoxViewModel();
 
-        SettingsViewModel CreateSettingsViewModel();
-    }
+    SettingsViewModel CreateSettingsViewModel();
 }

@@ -6,91 +6,90 @@ using SoundCloudDownloader.Services;
 using SoundCloudDownloader.ViewModels.Components;
 using SoundCloudDownloader.ViewModels.Framework;
 
-namespace SoundCloudDownloader.ViewModels
+namespace SoundCloudDownloader.ViewModels;
+
+public class RootViewModel : Screen
 {
-    public class RootViewModel : Screen
+    private readonly IViewModelFactory _viewModelFactory;
+    private readonly DialogManager _dialogManager;
+    private readonly SettingsService _settingsService;
+    private readonly UpdateService _updateService;
+
+    public SnackbarMessageQueue Notifications { get; } = new(TimeSpan.FromSeconds(5));
+
+    public DashboardViewModel Dashboard { get; }
+
+    public RootViewModel(
+        IViewModelFactory viewModelFactory,
+        DialogManager dialogManager,
+        SettingsService settingsService,
+        UpdateService updateService)
     {
-        private readonly IViewModelFactory _viewModelFactory;
-        private readonly DialogManager _dialogManager;
-        private readonly SettingsService _settingsService;
-        private readonly UpdateService _updateService;
+        _viewModelFactory = viewModelFactory;
+        _dialogManager = dialogManager;
+        _settingsService = settingsService;
+        _updateService = updateService;
 
-        public SnackbarMessageQueue Notifications { get; } = new(TimeSpan.FromSeconds(5));
+        Dashboard = _viewModelFactory.CreateDashboardViewModel();
 
-        public DashboardViewModel Dashboard { get; }
+        DisplayName = $"{App.Name} v{App.VersionString}";
+    }
 
-        public RootViewModel(
-            IViewModelFactory viewModelFactory,
-            DialogManager dialogManager,
-            SettingsService settingsService,
-            UpdateService updateService)
+    private async Task CheckForUpdatesAsync()
+    {
+        try
         {
-            _viewModelFactory = viewModelFactory;
-            _dialogManager = dialogManager;
-            _settingsService = settingsService;
-            _updateService = updateService;
+            var updateVersion = await _updateService.CheckForUpdatesAsync();
+            if (updateVersion is null)
+                return;
 
-            Dashboard = _viewModelFactory.CreateDashboardViewModel();
+            Notifications.Enqueue($"Downloading update to {App.Name} v{updateVersion}...");
+            await _updateService.PrepareUpdateAsync(updateVersion);
 
-            DisplayName = $"{App.Name} v{App.VersionString}";
+            Notifications.Enqueue(
+                "Update has been downloaded and will be installed when you exit",
+                "INSTALL NOW", () =>
+                {
+                    _updateService.FinalizeUpdate(true);
+                    RequestClose();
+                }
+            );
         }
-
-        private async Task CheckForUpdatesAsync()
+        catch
         {
-            try
-            {
-                var updateVersion = await _updateService.CheckForUpdatesAsync();
-                if (updateVersion is null)
-                    return;
-
-                Notifications.Enqueue($"Downloading update to {App.Name} v{updateVersion}...");
-                await _updateService.PrepareUpdateAsync(updateVersion);
-
-                Notifications.Enqueue(
-                    "Update has been downloaded and will be installed when you exit",
-                    "INSTALL NOW", () =>
-                    {
-                        _updateService.FinalizeUpdate(true);
-                        RequestClose();
-                    }
-                );
-            }
-            catch
-            {
-                // Failure to update shouldn't crash the application
-                Notifications.Enqueue("Failed to perform application update");
-            }
+            // Failure to update shouldn't crash the application
+            Notifications.Enqueue("Failed to perform application update");
         }
+    }
 
-        public async void OnViewFullyLoaded()
+    public async void OnViewFullyLoaded()
+    {
+        await CheckForUpdatesAsync();
+    }
+
+    protected override void OnViewLoaded()
+    {
+        base.OnViewLoaded();
+
+        _settingsService.Load();
+
+        if (_settingsService.IsDarkModeEnabled)
         {
-            await CheckForUpdatesAsync();
+            App.SetDarkTheme();
         }
-
-        protected override void OnViewLoaded()
+        else
         {
-            base.OnViewLoaded();
-
-            _settingsService.Load();
-
-            if (_settingsService.IsDarkModeEnabled)
-            {
-                App.SetDarkTheme();
-            }
-            else
-            {
-                App.SetLightTheme();
-            }
+            App.SetLightTheme();
         }
+    }
 
-        protected override void OnClose()
-        {
-            base.OnClose();
+    protected override void OnClose()
+    {
+        base.OnClose();
 
-            Dashboard.CancelAllDownloads();
+        Dashboard.CancelAllDownloads();
 
-            _settingsService.Save();
-            _updateService.FinalizeUpdate(false);
-        }
+        _settingsService.Save();
+        _updateService.FinalizeUpdate(false);
     }
 }

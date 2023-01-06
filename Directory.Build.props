@@ -1,8 +1,8 @@
 <Project>
 
   <PropertyGroup>
-    <TargetFramework>net5.0-windows</TargetFramework>
-    <Version>1.4.3</Version>
+    <TargetFramework>net7.0-windows</TargetFramework>
+    <Version>1.4.4</Version>
     <Company>Jero</Company>
     <Copyright>Copyright (C) Jero</Copyright>
     <LangVersion>preview</LangVersion>

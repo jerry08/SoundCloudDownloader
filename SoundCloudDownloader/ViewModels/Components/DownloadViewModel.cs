@@ -3,7 +3,6 @@ using System.IO;
 using System.Threading;
 using Gress;
 using Stylet;
-using SoundCloudDownloader.Core.Downloading;
 using SoundCloudDownloader.Utils;
 using SoundCloudDownloader.ViewModels.Dialogs;
 using SoundCloudDownloader.ViewModels.Framework;

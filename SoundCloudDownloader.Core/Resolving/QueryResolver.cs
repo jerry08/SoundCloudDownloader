@@ -18,7 +18,7 @@ public class QueryResolver
         string query,
         CancellationToken cancellationToken = default)
     {
-        // Playlist
+        // Playlist/Album
         if (_soundcloud.Playlists.IsUrlValid(query))
         {
             var playlist = await _soundcloud.Playlists.GetAsync(query, true, cancellationToken);
@@ -33,9 +33,9 @@ public class QueryResolver
             return new QueryResult(QueryResultKind.Track, track!.Title!, new[] { track });
         }
 
-        // Default
+        // Search
         {
-            var tracks = await _soundcloud.Tracks.GetTracksAsync(query, cancellationToken);
+            var tracks = await _soundcloud.Search.GetTracksAsync(query, 0, 50, cancellationToken);
             return new QueryResult(QueryResultKind.Track, "Tracks", tracks);
         }
     }

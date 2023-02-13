@@ -11,7 +11,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="FFMpegCore" Version="4.8.0" />
     <PackageReference Include="Gress" Version="2.0.1" />
     <PackageReference Include="MaterialDesignThemes" Version="4.7.0" />
     <PackageReference Include="Microsoft.Xaml.Behaviors.Wpf" Version="1.1.39" />
@@ -28,15 +27,4 @@
   <ItemGroup>
     <ProjectReference Include="..\SoundCloudDownloader.Core\SoundCloudDownloader.Core.csproj" />
   </ItemGroup>
-
-<!-- This downloads FFmpeg and copies it to output directory-->
-  <Target Name="Download FFmpeg before build" BeforeTargets="PreBuildEvent">
-    <Exec Command="powershell -ExecutionPolicy Bypass -File &quot;$(ProjectDir)/DownloadFfmpeg.ps1&quot;" />
-    <Copy SourceFiles="$(ProjectDir)/ffmpeg.exe" DestinationFiles="$(OutDir)/ffmpeg.exe" />
-  </Target>
-
-  <Target Name="Download FFmpeg before publish" BeforeTargets="PrepareForPublish">
-    <Exec Command="powershell -ExecutionPolicy Bypass -File &quot;$(ProjectDir)/DownloadFfmpeg.ps1&quot;" />
-    <Copy SourceFiles="$(ProjectDir)/ffmpeg.exe" DestinationFiles="$(PublishDir)/ffmpeg.exe" />
-  </Target>
 </Project>

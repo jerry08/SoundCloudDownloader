@@ -25,3 +25,5 @@ This application uses [**SoundCloudExplode**](https://github.com/jerry08/SoundCl
 ![list](.assets/list.png)
 ![single](.assets/single.png)
 ![multiple](.assets/multiple.png)
+
+**This project was inspired by [YoutubeDownloader](https://github.com/Tyrrrz/YoutubeDownloader).**

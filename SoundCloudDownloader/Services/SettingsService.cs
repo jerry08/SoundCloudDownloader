@@ -1,9 +1,14 @@
-﻿using Tyrrrz.Settings;
+﻿using System;
+using System.ComponentModel;
+using System.IO;
+using Cogwheel;
 using Microsoft.Win32;
+using PropertyChanged;
 
 namespace SoundCloudDownloader.Services;
 
-public partial class SettingsService : SettingsManager
+[AddINotifyPropertyChangedInterface]
+public partial class SettingsService : SettingsBase, INotifyPropertyChanged
 {
     public bool IsAutoUpdateEnabled { get; set; } = true;
 
@@ -20,10 +25,8 @@ public partial class SettingsService : SettingsManager
     public string LastContainer { get; set; } = "mp3";
 
     public SettingsService()
+        : base(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Settings.dat"))
     {
-        Configuration.StorageSpace = StorageSpace.Instance;
-        Configuration.SubDirectoryPath = "";
-        Configuration.FileName = "Settings.dat";
     }
 }
 

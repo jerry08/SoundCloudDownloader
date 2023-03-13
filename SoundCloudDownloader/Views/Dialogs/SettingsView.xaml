@@ -126,6 +126,9 @@
                                 <LineBreak />
                                 <Run FontWeight="SemiBold" Text="$author" />
                                 <Run Text="- track artist" />
+                                <LineBreak />
+                                <Run FontWeight="SemiBold" Text="$album" />
+                                <Run Text="- track album/playlist name if available. It's only available when downloading tracks from an album/playlist url." />
                             </TextBlock>
                         </DockPanel.ToolTip>
                         <TextBlock

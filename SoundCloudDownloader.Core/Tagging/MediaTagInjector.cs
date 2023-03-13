@@ -54,13 +54,18 @@ public class MediaTagInjector
             mediaFile.SetAlbum(recording.Album);
     }
 
-    private static void InjectTrackMetadataAsync(
+    private static void InjectTrackMetadata(
         MediaFile mediaFile,
         TrackInformation track)
     {
         mediaFile.SetTitle(track.Title!);
         mediaFile.SetPerformers(new[] { track.User!.Username! });
-        mediaFile.SetAlbum(track.User.Username!);
+
+        if (!string.IsNullOrWhiteSpace(track.PlaylistName))
+            mediaFile.SetAlbum(track.PlaylistName);
+
+        if (!string.IsNullOrWhiteSpace(track.Genre))
+            mediaFile.SetGenre(track.Genre);
     }
 
     private async Task InjectThumbnailAsync(
@@ -89,7 +94,7 @@ public class MediaTagInjector
 
         InjectMiscMetadata(mediaFile, track);
         //await InjectMusicMetadataAsync(mediaFile, track, cancellationToken);
-        InjectTrackMetadataAsync(mediaFile, track);
+        InjectTrackMetadata(mediaFile, track);
         await InjectThumbnailAsync(mediaFile, track, cancellationToken);
     }
 }

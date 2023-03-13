@@ -28,6 +28,9 @@ internal partial class MediaFile : IDisposable
     public void SetAlbum(string album) =>
         _file.Tag.Album = album;
 
+    public void SetGenre(string genre) =>
+        _file.Tag.Genres = new[] { genre };
+
     public void SetDescription(string description) =>
         _file.Tag.Description = description;
 

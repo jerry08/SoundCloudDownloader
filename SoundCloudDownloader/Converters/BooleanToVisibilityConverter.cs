@@ -1,32 +1,44 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Globalization;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Data;
 
 namespace SoundCloudDownloader.Converters;
 
-public class BooleanToVisibilityConverter : IValueConverter
+[ValueConversion(typeof(bool), typeof(Visibility))]
+public partial class BoolToVisibilityConverter : IValueConverter
 {
-    private object GetVisibility(object value)
-    {
-        if (value is not bool)
-        {
-            return Visibility.Collapsed;
-        }
+    private readonly Visibility _trueVisibility;
+    private readonly Visibility _falseVisibility;
 
-        bool objValue = (bool)value;
-        return objValue ? Visibility.Visible : (object)Visibility.Collapsed;
-    }
-    public object Convert(object value, Type targetType, object parameter, CultureInfo language)
+    public BoolToVisibilityConverter(Visibility trueVisibility, Visibility falseVisibility)
     {
-        return GetVisibility(value);
+        _trueVisibility = trueVisibility;
+        _falseVisibility = falseVisibility;
     }
-    public object ConvertBack(object value, Type targetType, object parameter, CultureInfo language)
-    {
-        throw new NotImplementedException();
-    }
+
+    public object Convert(object value, Type targetType, object parameter, CultureInfo culture) =>
+        value is true
+            ? _trueVisibility
+            : _falseVisibility;
+
+    public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture) =>
+        value is Visibility visibility
+            ? visibility == _trueVisibility
+            : throw new NotSupportedException();
+}
+
+public partial class BoolToVisibilityConverter
+{
+    public static BoolToVisibilityConverter VisibleOrCollapsed { get; } =
+        new(Visibility.Visible, Visibility.Collapsed);
+
+    public static BoolToVisibilityConverter VisibleOrHidden { get; } =
+        new(Visibility.Visible, Visibility.Hidden);
+
+    public static BoolToVisibilityConverter CollapsedOrVisible { get; } =
+        new(Visibility.Collapsed, Visibility.Visible);
+
+    public static BoolToVisibilityConverter HiddenOrVisible { get; } =
+        new(Visibility.Hidden, Visibility.Visible);
 }

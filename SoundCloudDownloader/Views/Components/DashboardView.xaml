@@ -3,6 +3,7 @@
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:components="clr-namespace:SoundCloudDownloader.ViewModels.Components"
+    xmlns:converters="clr-namespace:SoundCloudDownloader.Converters"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
@@ -113,7 +114,7 @@
             <StackPanel
                 Margin="8,32,8,8"
                 HorizontalAlignment="Center"
-                Visibility="{Binding Downloads.Count, Converter={x:Static s:BoolToVisibilityConverter.InverseInstance}}">
+                Visibility="{Binding IsDownloadsAvailable, Converter={x:Static converters:BoolToVisibilityConverter.CollapsedOrVisible}}">
                 <materialDesign:PackIcon
                     Width="258"
                     Height="258"
@@ -147,9 +148,9 @@
                 ItemsSource="{Binding Downloads}"
                 ScrollViewer.CanContentScroll="False"
                 VerticalScrollBarVisibility="Auto"
-                Visibility="{Binding Downloads.Count, Converter={StaticResource BoolToVisibilityConverter}}">
-                <!-- Fix bug that causes track info to not show when downloading. Removed line below -->
-                <!--Visibility="{Binding Downloads.Count, Converter={x:Static s:BoolToVisibilityConverter.Instance}}"-->
+                Visibility="{Binding IsDownloadsAvailable, Converter={x:Static converters:BoolToVisibilityConverter.VisibleOrHidden}}">
+                <!--  Fix bug that causes track info to not show when downloading. Removed line below  -->
+                <!--  Visibility="{Binding Downloads.Count, Converter={x:Static s:BoolToVisibilityConverter.Instance}}"  -->
                 <DataGrid.ContextMenu>
                     <ContextMenu>
                         <MenuItem Command="{s:Action RemoveSuccessfulDownloads}" Header="Remove successful downloads" />
@@ -179,8 +180,7 @@
                 <!--  Columns  -->
                 <DataGrid.Columns>
                     <!--  Thumbnail  -->
-                    <DataGridTemplateColumn
-                        Width="*">
+                    <DataGridTemplateColumn Width="*">
                         <DataGridTemplateColumn.CellTemplate>
                             <DataTemplate DataType="{x:Type components:DownloadViewModel}">
                                 <Image
@@ -314,7 +314,7 @@
                                         Command="{s:Action ShowFile}"
                                         Style="{DynamicResource MaterialDesignFlatButton}"
                                         ToolTip="Show file"
-                                        Visibility="{Binding CanShowFile, Converter={x:Static s:BoolToVisibilityConverter.Instance}}">
+                                        Visibility="{Binding CanShowFile, Converter={x:Static converters:BoolToVisibilityConverter.VisibleOrCollapsed}}">
                                         <materialDesign:PackIcon
                                             Width="24"
                                             Height="24"
@@ -329,7 +329,7 @@
                                         Command="{s:Action OpenFile}"
                                         Style="{DynamicResource MaterialDesignFlatButton}"
                                         ToolTip="Play"
-                                        Visibility="{Binding CanOpenFile, Converter={x:Static s:BoolToVisibilityConverter.Instance}}">
+                                        Visibility="{Binding CanOpenFile, Converter={x:Static converters:BoolToVisibilityConverter.VisibleOrCollapsed}}">
                                         <materialDesign:PackIcon
                                             Width="24"
                                             Height="24"
@@ -344,7 +344,7 @@
                                         Command="{s:Action Cancel}"
                                         Style="{DynamicResource MaterialDesignFlatButton}"
                                         ToolTip="Cancel download"
-                                        Visibility="{Binding CanCancel, Converter={x:Static s:BoolToVisibilityConverter.Instance}}">
+                                        Visibility="{Binding CanCancel, Converter={x:Static converters:BoolToVisibilityConverter.VisibleOrCollapsed}}">
                                         <materialDesign:PackIcon
                                             Width="24"
                                             Height="24"
@@ -359,7 +359,7 @@
                                         CommandParameter="{Binding}"
                                         Style="{DynamicResource MaterialDesignFlatButton}"
                                         ToolTip="Restart download"
-                                        Visibility="{Binding IsCanceledOrFailed, Converter={x:Static s:BoolToVisibilityConverter.Instance}}">
+                                        Visibility="{Binding IsCanceledOrFailed, Converter={x:Static converters:BoolToVisibilityConverter.VisibleOrCollapsed}}">
                                         <materialDesign:PackIcon
                                             Width="24"
                                             Height="24"

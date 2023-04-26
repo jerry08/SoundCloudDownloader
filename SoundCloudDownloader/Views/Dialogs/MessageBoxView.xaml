@@ -2,6 +2,7 @@
     x:Class="SoundCloudDownloader.Views.Dialogs.MessageBoxView"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:converters="clr-namespace:SoundCloudDownloader.Converters"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:dialogs="clr-namespace:SoundCloudDownloader.ViewModels.Dialogs"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
@@ -53,7 +54,7 @@
                 Content="{Binding OkButtonText}"
                 IsDefault="True"
                 Style="{DynamicResource MaterialDesignOutlinedButton}"
-                Visibility="{Binding IsOkButtonVisible, Converter={x:Static s:BoolToVisibilityConverter.Instance}}">
+                Visibility="{Binding IsOkButtonVisible, Converter={x:Static converters:BoolToVisibilityConverter.VisibleOrCollapsed}}">
                 <Button.CommandParameter>
                     <system:Boolean>True</system:Boolean>
                 </Button.CommandParameter>
@@ -67,7 +68,7 @@
                 Content="{Binding CancelButtonText}"
                 IsCancel="True"
                 Style="{DynamicResource MaterialDesignOutlinedButton}"
-                Visibility="{Binding IsCancelButtonVisible, Converter={x:Static s:BoolToVisibilityConverter.Instance}}" />
+                Visibility="{Binding IsCancelButtonVisible, Converter={x:Static converters:BoolToVisibilityConverter.VisibleOrCollapsed}}" />
         </UniformGrid>
     </Grid>
 </UserControl>

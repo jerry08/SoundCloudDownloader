@@ -6,7 +6,6 @@ using System.Collections.Generic;
 using Gress;
 using SoundCloudExplode;
 using SoundCloudExplode.Track;
-using SoundCloudExplode.Common;
 
 namespace SoundCloudDownloader.Core.Resolving;
 

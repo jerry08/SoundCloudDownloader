@@ -4,15 +4,15 @@ using System.Linq;
 using System.Threading.Tasks;
 using Gress;
 using Gress.Completable;
-using Stylet;
-using SoundCloudDownloader.Utils;
-using SoundCloudDownloader.Services;
-using SoundCloudDownloader.Core.Tagging;
-using SoundCloudDownloader.Core.Resolving;
 using SoundCloudDownloader.Core.Downloading;
+using SoundCloudDownloader.Core.Resolving;
+using SoundCloudDownloader.Core.Tagging;
+using SoundCloudDownloader.Services;
+using SoundCloudDownloader.Utils;
 using SoundCloudDownloader.ViewModels.Dialogs;
 using SoundCloudDownloader.ViewModels.Framework;
 using SoundCloudExplode.Exceptions;
+using Stylet;
 
 namespace SoundCloudDownloader.ViewModels.Components;
 

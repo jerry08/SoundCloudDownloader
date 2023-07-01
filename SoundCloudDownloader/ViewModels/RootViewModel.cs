@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Threading.Tasks;
 using MaterialDesignThemes.Wpf;
-using Stylet;
 using SoundCloudDownloader.Services;
 using SoundCloudDownloader.ViewModels.Components;
 using SoundCloudDownloader.ViewModels.Framework;
+using Stylet;
 
 namespace SoundCloudDownloader.ViewModels;
 

@@ -1,6 +1,6 @@
 ﻿using System;
-using SoundCloudExplode.Track;
 using SoundCloudDownloader.Core.Utils;
+using SoundCloudExplode.Track;
 
 namespace SoundCloudDownloader.Core.Downloading;
 

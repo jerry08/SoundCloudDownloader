@@ -2,8 +2,8 @@
 using System.Reflection;
 using System.Windows;
 using System.Windows.Media;
-using MaterialDesignThemes.Wpf;
 using System.Windows.Threading;
+using MaterialDesignThemes.Wpf;
 using SoundCloudDownloader.Utils;
 
 namespace SoundCloudDownloader;

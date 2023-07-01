@@ -1,13 +1,13 @@
 ﻿using System;
 using System.IO;
 using System.Threading;
+using System.Windows;
 using Gress;
-using Stylet;
-using SoundCloudDownloader.Core.Downloading;
 using SoundCloudDownloader.Utils;
 using SoundCloudDownloader.ViewModels.Dialogs;
 using SoundCloudDownloader.ViewModels.Framework;
 using SoundCloudExplode.Track;
+using Stylet;
 
 namespace SoundCloudDownloader.ViewModels.Components;
 
@@ -91,6 +91,16 @@ public class DownloadViewModel : PropertyChangedBase, IDisposable
                 _viewModelFactory.CreateMessageBoxViewModel("Error", ex.Message)
             );
         }
+    }
+
+    public bool CanCopyErrorMessage => !string.IsNullOrWhiteSpace(ErrorMessage);
+
+    public void CopyErrorMessage()
+    {
+        if (!CanCopyErrorMessage)
+            return;
+
+        Clipboard.SetText(ErrorMessage!);
     }
 
     public void Dispose() => _cancellationTokenSource.Dispose();

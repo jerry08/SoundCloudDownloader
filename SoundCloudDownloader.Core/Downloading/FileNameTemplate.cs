@@ -4,7 +4,7 @@ using SoundCloudExplode.Tracks;
 
 namespace SoundCloudDownloader.Core.Downloading;
 
-public class FileNameTemplate
+public static class FileNameTemplate
 {
     public static string Apply(
         string template,

@@ -8,7 +8,7 @@ using SoundCloudDownloader.Services;
 using SoundCloudDownloader.Utils;
 using SoundCloudDownloader.ViewModels.Components;
 using SoundCloudDownloader.ViewModels.Framework;
-using SoundCloudExplode.Track;
+using SoundCloudExplode.Tracks;
 
 namespace SoundCloudDownloader.ViewModels.Dialogs;
 
@@ -20,9 +20,9 @@ public class DownloadMultipleSetupViewModel : DialogScreen<IReadOnlyList<Downloa
 
     public string? Title { get; set; }
 
-    public IReadOnlyList<TrackInformation>? AvailableTracks { get; set; }
+    public IReadOnlyList<Track>? AvailableTracks { get; set; }
 
-    public IReadOnlyList<TrackInformation>? SelectedTracks { get; set; }
+    public IReadOnlyList<Track>? SelectedTracks { get; set; }
 
     public IReadOnlyList<string> AvailableContainers { get; } = new[]
     {
@@ -101,7 +101,7 @@ public static class DownloadMultipleSetupViewModelExtensions
     public static DownloadMultipleSetupViewModel CreateDownloadMultipleSetupViewModel(
         this IViewModelFactory factory,
         string title,
-        IReadOnlyList<TrackInformation> availableTracks,
+        IReadOnlyList<Track> availableTracks,
         bool preselectTracks = true)
     {
         var viewModel = factory.CreateDownloadMultipleSetupViewModel();
@@ -110,7 +110,7 @@ public static class DownloadMultipleSetupViewModelExtensions
         viewModel.AvailableTracks = availableTracks;
         viewModel.SelectedTracks = preselectTracks
             ? availableTracks
-            : Array.Empty<TrackInformation>();
+            : Array.Empty<Track>();
 
         return viewModel;
     }

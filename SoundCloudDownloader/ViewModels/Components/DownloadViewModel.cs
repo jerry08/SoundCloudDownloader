@@ -6,7 +6,7 @@ using Gress;
 using SoundCloudDownloader.Utils;
 using SoundCloudDownloader.ViewModels.Dialogs;
 using SoundCloudDownloader.ViewModels.Framework;
-using SoundCloudExplode.Track;
+using SoundCloudExplode.Tracks;
 using Stylet;
 
 namespace SoundCloudDownloader.ViewModels.Components;
@@ -18,7 +18,7 @@ public class DownloadViewModel : PropertyChangedBase, IDisposable
 
     private readonly CancellationTokenSource _cancellationTokenSource = new();
 
-    public TrackInformation? Track { get; set; }
+    public Track? Track { get; set; }
 
     public string? FilePath { get; set; }
 
@@ -110,7 +110,7 @@ public static class DownloadViewModelExtensions
 {
     public static DownloadViewModel CreateDownloadViewModel(
         this IViewModelFactory factory,
-        TrackInformation track,
+        Track track,
         string filePath)
     {
         var viewModel = factory.CreateDownloadViewModel();

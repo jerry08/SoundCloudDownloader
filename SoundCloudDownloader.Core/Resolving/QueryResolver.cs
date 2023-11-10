@@ -5,7 +5,8 @@ using System.Threading;
 using System.Threading.Tasks;
 using Gress;
 using SoundCloudExplode;
-using SoundCloudExplode.Track;
+using SoundCloudExplode.Common;
+using SoundCloudExplode.Tracks;
 
 namespace SoundCloudDownloader.Core.Resolving;
 
@@ -21,7 +22,7 @@ public class QueryResolver
         if (await _soundcloud.Playlists.IsUrlValidAsync(query))
         {
             var playlist = await _soundcloud.Playlists.GetAsync(query, false, cancellationToken);
-            var tracks = await _soundcloud.Playlists.GetTracksAsync(query, cancellationToken: cancellationToken);
+            var tracks = await _soundcloud.Playlists.GetTracksAsync(query, cancellationToken);
             return new QueryResult(QueryResultKind.Playlist, $"Playlist: {playlist!.Title}", tracks);
         }
 
@@ -47,7 +48,7 @@ public class QueryResolver
         if (queries.Count == 1)
             return await ResolveAsync(queries.Single(), cancellationToken);
 
-        var tracks = new List<TrackInformation>();
+        var tracks = new List<Track>();
 
         var completed = 0;
 

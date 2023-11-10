@@ -1,10 +1,10 @@
 ﻿using System.Collections.Generic;
-using SoundCloudExplode.Track;
+using SoundCloudExplode.Tracks;
 
 namespace SoundCloudDownloader.Core.Resolving;
 
 public record QueryResult(
     QueryResultKind Kind,
     string Title,
-    IReadOnlyList<TrackInformation> Tracks
+    IReadOnlyList<Track> Tracks
 );

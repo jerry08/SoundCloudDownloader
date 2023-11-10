@@ -1,6 +1,6 @@
 ﻿using System;
 using SoundCloudDownloader.Core.Utils;
-using SoundCloudExplode.Track;
+using SoundCloudExplode.Tracks;
 
 namespace SoundCloudDownloader.Core.Downloading;
 
@@ -8,7 +8,7 @@ public class FileNameTemplate
 {
     public static string Apply(
         string template,
-        TrackInformation track,
+        Track track,
         string ext,
         string? number = null) =>
         PathEx.EscapeFileName(

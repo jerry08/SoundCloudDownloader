@@ -8,7 +8,7 @@ using SoundCloudDownloader.Services;
 using SoundCloudDownloader.Utils;
 using SoundCloudDownloader.ViewModels.Components;
 using SoundCloudDownloader.ViewModels.Framework;
-using SoundCloudExplode.Track;
+using SoundCloudExplode.Tracks;
 
 namespace SoundCloudDownloader.ViewModels.Dialogs;
 
@@ -18,7 +18,7 @@ public class DownloadSingleSetupViewModel : DialogScreen<DownloadViewModel>
     private readonly DialogManager _dialogManager;
     private readonly SettingsService _settingsService;
 
-    public TrackInformation? Track { get; set; }
+    public Track? Track { get; set; }
 
     public IReadOnlyList<string>? AvailableDownloadOptions { get; set; } = new[]
     {
@@ -80,7 +80,7 @@ public static class DownloadSingleSetupViewModelExtensions
 {
     public static DownloadSingleSetupViewModel CreateDownloadSingleSetupViewModel(
         this IViewModelFactory factory,
-        TrackInformation track)
+        Track track)
     {
         var viewModel = factory.CreateDownloadSingleSetupViewModel();
 

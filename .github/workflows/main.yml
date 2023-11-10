@@ -48,6 +48,9 @@ jobs:
           name: SoundCloudDownloader
           path: SoundCloudDownloader/
 
+      - name: Checkout
+        uses: actions/checkout@v3
+        
       - name: Set version and package name
         run: |
           TAG_NAME="${{ github.ref_name }}"
@@ -59,9 +62,9 @@ jobs:
       - name: Set body
         run: |
           git fetch --depth=1 origin +refs/tags/*:refs/tags/*
-          TAG_MESSAGE_TEMP=$(git tag -l --format='%(contents)' ${GITHUB_REF#refs/*/})
+          TAG_MESSAGE=$(git tag -l --format='%(contents)' ${GITHUB_REF#refs/*/})
           echo "TAG_MESSAGE<<EOF" >> $GITHUB_ENV
-          echo "$TAG_MESSAGE_TEMP" >> $GITHUB_ENV
+          echo "$TAG_MESSAGE" >> $GITHUB_ENV
           echo "EOF" >> $GITHUB_ENV
 
       - name: Create package

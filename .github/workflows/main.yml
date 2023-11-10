@@ -1,10 +1,15 @@
 name: main
 
-on: [push, pull_request]
+on:
+  push:
+  pull_request:
 
 jobs:
-  build:
+  pack:
     runs-on: windows-latest
+    permissions:
+      actions: write
+      contents: read
 
     steps:
       - name: Checkout
@@ -15,13 +20,62 @@ jobs:
         with:
           dotnet-version: 7.0.x
 
-      - name: Publish
+      - name: Publish app
         run: >
           dotnet publish SoundCloudDownloader
           --output SoundCloudDownloader/bin/publish
           --configuration Release
+
       - name: Upload artifacts
         uses: actions/upload-artifact@v3
         with:
           name: SoundCloudDownloader
           path: SoundCloudDownloader/bin/publish
+          if-no-files-found: error
+
+  deploy:
+    if: ${{ github.event_name == 'push' && github.ref_type == 'tag' }}
+    needs: pack
+    runs-on: ubuntu-latest
+    permissions:
+      actions: read
+      contents: write
+
+    steps:
+      - name: Download artifacts
+        uses: actions/download-artifact@v3
+        with:
+          name: SoundCloudDownloader
+          path: SoundCloudDownloader/
+
+      - name: Set version and package name
+        run: |
+          TAG_NAME="${{ github.ref_name }}"
+          echo $TAG_NAME
+          VERSION="$(echo $TAG_NAME | tr -d v)"
+          echo "VERSION=$VERSION" >> $GITHUB_ENV
+          echo "PACKAGE_NAME=${{ github.event.repository.name }}-$TAG_NAME.apk" >> $GITHUB_ENV
+          
+      - name: Set body
+        run: |
+          git fetch --depth=1 origin +refs/tags/*:refs/tags/*
+          TAG_MESSAGE=$(git tag -l --format='%(contents)' ${GITHUB_REF#refs/*/})
+          echo "TAG_MESSAGE<<EOF" >> $GITHUB_ENV
+          echo "$TAG_MESSAGE" >> $GITHUB_ENV
+          echo "EOF" >> $GITHUB_ENV
+
+      - name: Create package
+        # Change into the artifacts directory to avoid including the directory itself in the zip archive
+        working-directory: SoundCloudDownloader/
+        run: zip -r ../SoundCloudDownloader.zip .
+
+      - name: Create release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: >
+          gh release create ${{ github.ref_name }}
+          SoundCloudDownloader.zip
+          --repo ${{ github.event.repository.full_name }}
+          --title "${{ env.VERSION }}"
+          --notes "${{ env.TAG_MESSAGE }}"
+          --verify-tag

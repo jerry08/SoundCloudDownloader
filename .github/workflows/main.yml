@@ -47,17 +47,6 @@ jobs:
       contents: write
 
     steps:
-      - name: Download artifacts
-        uses: actions/download-artifact@v3
-        with:
-          name: SoundCloudDownloader
-          path: SoundCloudDownloader/
-
-      - name: Create package
-        # Change into the artifacts directory to avoid including the directory itself in the zip archive
-        working-directory: SoundCloudDownloader/
-        run: zip -r ../SoundCloudDownloader.zip .
-        
       - name: Checkout
         uses: actions/checkout@v3
         
@@ -76,6 +65,17 @@ jobs:
           echo "TAG_MESSAGE<<EOF" >> $GITHUB_ENV
           echo "$TAG_MESSAGE" >> $GITHUB_ENV
           echo "EOF" >> $GITHUB_ENV
+          
+      - name: Download artifacts
+        uses: actions/download-artifact@v3
+        with:
+          name: SoundCloudDownloader
+          path: SoundCloudDownloader/
+
+      - name: Create package
+        # Change into the artifacts directory to avoid including the directory itself in the zip archive
+        working-directory: SoundCloudDownloader/
+        run: zip -r ../SoundCloudDownloader.zip .
 
       - name: Create release
         env:

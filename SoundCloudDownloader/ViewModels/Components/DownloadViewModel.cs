@@ -1,26 +1,60 @@
 ﻿using System;
 using System.IO;
 using System.Threading;
-using System.Windows;
+using System.Threading.Tasks;
+using Avalonia;
+using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
 using Gress;
+using SoundCloudDownloader.Framework;
 using SoundCloudDownloader.Utils;
-using SoundCloudDownloader.ViewModels.Dialogs;
-using SoundCloudDownloader.ViewModels.Framework;
+using SoundCloudDownloader.Utils.Extensions;
 using SoundCloudExplode.Tracks;
-using Stylet;
 
 namespace SoundCloudDownloader.ViewModels.Components;
 
-public class DownloadViewModel : PropertyChangedBase, IDisposable
+public partial class DownloadViewModel : ViewModelBase
 {
-    private readonly IViewModelFactory _viewModelFactory;
+    private readonly ViewModelManager _viewModelManager;
     private readonly DialogManager _dialogManager;
 
+    private readonly DisposableCollector _eventRoot = new();
     private readonly CancellationTokenSource _cancellationTokenSource = new();
 
-    public Track? Track { get; set; }
+    private bool _isDisposed;
 
-    public string? FilePath { get; set; }
+    [ObservableProperty]
+    private Track? _track;
+
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(FileName))]
+    private string? _filePath;
+
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(IsCanceledOrFailed))]
+    [NotifyCanExecuteChangedFor(nameof(CancelCommand))]
+    [NotifyCanExecuteChangedFor(nameof(ShowFileCommand))]
+    [NotifyCanExecuteChangedFor(nameof(OpenFileCommand))]
+    private DownloadStatus _status = DownloadStatus.Enqueued;
+
+    [ObservableProperty]
+    [NotifyCanExecuteChangedFor(nameof(CopyErrorMessageCommand))]
+    private string? _errorMessage;
+
+    public DownloadViewModel(ViewModelManager viewModelManager, DialogManager dialogManager)
+    {
+        _viewModelManager = viewModelManager;
+        _dialogManager = dialogManager;
+
+        _eventRoot.Add(
+            Progress.WatchProperty(
+                o => o.Current,
+                () => OnPropertyChanged(nameof(IsProgressIndeterminate))
+            )
+        );
+    }
+
+    public CancellationToken CancellationToken => _cancellationTokenSource.Token;
 
     public string? FileName => Path.GetFileName(FilePath);
 
@@ -28,96 +62,83 @@ public class DownloadViewModel : PropertyChangedBase, IDisposable
 
     public bool IsProgressIndeterminate => Progress.Current.Fraction is <= 0 or >= 1;
 
-    public CancellationToken CancellationToken => _cancellationTokenSource.Token;
-
-    public DownloadStatus Status { get; set; } = DownloadStatus.Enqueued;
-
     public bool IsCanceledOrFailed => Status is DownloadStatus.Canceled or DownloadStatus.Failed;
 
-    public string? ErrorMessage { get; set; }
+    private bool CanCancel() => Status is DownloadStatus.Enqueued or DownloadStatus.Started;
 
-    public DownloadViewModel(IViewModelFactory viewModelFactory, DialogManager dialogManager)
+    [RelayCommand(CanExecute = nameof(CanCancel))]
+    private void Cancel()
     {
-        _viewModelFactory = viewModelFactory;
-        _dialogManager = dialogManager;
-
-        Progress.Bind(o => o.Current, (_, _) => NotifyOfPropertyChange(() => IsProgressIndeterminate));
-    }
-
-    public bool CanCancel => Status is DownloadStatus.Enqueued or DownloadStatus.Started;
-
-    public void Cancel()
-    {
-        if (!CanCancel)
+        if (_isDisposed)
             return;
 
         _cancellationTokenSource.Cancel();
     }
 
-    public bool CanShowFile => Status == DownloadStatus.Completed;
+    private bool CanShowFile() =>
+        Status == DownloadStatus.Completed
+        // This only works on Windows currently
+        && OperatingSystem.IsWindows();
 
-    public async void ShowFile()
+    [RelayCommand(CanExecute = nameof(CanShowFile))]
+    private async Task ShowFileAsync()
     {
-        if (!CanShowFile)
+        if (string.IsNullOrWhiteSpace(FilePath))
             return;
 
         try
         {
             // Navigate to the file in Windows Explorer
-            ProcessEx.Start("explorer", new[] { "/select,", FilePath! });
+            ProcessEx.Start("explorer", ["/select,", FilePath]);
         }
         catch (Exception ex)
         {
             await _dialogManager.ShowDialogAsync(
-                _viewModelFactory.CreateMessageBoxViewModel("Error", ex.Message)
+                _viewModelManager.CreateMessageBoxViewModel("Error", ex.Message)
             );
         }
     }
 
-    public bool CanOpenFile => Status == DownloadStatus.Completed;
+    private bool CanOpenFile() => Status == DownloadStatus.Completed;
 
-    public async void OpenFile()
+    [RelayCommand(CanExecute = nameof(CanOpenFile))]
+    private async Task OpenFileAsync()
     {
-        if (!CanOpenFile)
+        if (string.IsNullOrWhiteSpace(FilePath))
             return;
 
         try
         {
-            ProcessEx.StartShellExecute(FilePath!);
+            ProcessEx.StartShellExecute(FilePath);
         }
         catch (Exception ex)
         {
             await _dialogManager.ShowDialogAsync(
-                _viewModelFactory.CreateMessageBoxViewModel("Error", ex.Message)
+                _viewModelManager.CreateMessageBoxViewModel("Error", ex.Message)
             );
         }
     }
 
-    public bool CanCopyErrorMessage => !string.IsNullOrWhiteSpace(ErrorMessage);
-
-    public void CopyErrorMessage()
+    [RelayCommand]
+    private async Task CopyErrorMessageAsync()
     {
-        if (!CanCopyErrorMessage)
+        if (string.IsNullOrWhiteSpace(ErrorMessage))
             return;
 
-        Clipboard.SetText(ErrorMessage!);
+        if (Application.Current?.ApplicationLifetime?.TryGetTopLevel()?.Clipboard is { } clipboard)
+            await clipboard.SetTextAsync(ErrorMessage);
     }
 
-    public void Dispose() => _cancellationTokenSource.Dispose();
-}
-
-public static class DownloadViewModelExtensions
-{
-    public static DownloadViewModel CreateDownloadViewModel(
-        this IViewModelFactory factory,
-        Track track,
-        string filePath)
+    protected override void Dispose(bool disposing)
     {
-        var viewModel = factory.CreateDownloadViewModel();
+        if (disposing)
+        {
+            _eventRoot.Dispose();
+            _cancellationTokenSource.Dispose();
 
-        viewModel.Track = track;
-        viewModel.FilePath = filePath;
+            _isDisposed = true;
+        }
 
-        return viewModel;
+        base.Dispose(disposing);
     }
 }

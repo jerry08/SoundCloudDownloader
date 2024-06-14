@@ -1,0 +1,163 @@
+<UserControl
+    x:Class="SoundCloudDownloader.Views.Dialogs.SettingsView"
+    xmlns="https://github.com/avaloniaui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:dialogs="clr-namespace:SoundCloudDownloader.ViewModels.Dialogs"
+    xmlns:materialIcons="clr-namespace:Material.Icons.Avalonia;assembly=Material.Icons.Avalonia"
+    Width="380"
+    x:DataType="dialogs:SettingsViewModel">
+    <Grid RowDefinitions="Auto,*,Auto">
+        <Grid Grid.Row="0" ColumnDefinitions="*,Auto">
+            <TextBlock
+                Grid.Column="0"
+                Margin="16"
+                FontSize="19"
+                FontWeight="Light"
+                Text="Settings" />
+
+            <Button
+                Grid.Column="1"
+                Margin="8,0,0,0"
+                Padding="8"
+                VerticalAlignment="Center"
+                Command="{Binding CloseCommand}"
+                CornerRadius="30"
+                Foreground="{DynamicResource MaterialDarkForegroundBrush}"
+                Opacity="0.7"
+                Theme="{DynamicResource MaterialFlatButton}">
+                <materialIcons:MaterialIcon
+                    Width="24"
+                    Height="24"
+                    Foreground="{DynamicResource MaterialLightForegroundBrush}"
+                    Kind="Close" />
+            </Button>
+        </Grid>
+
+        <Border
+            Grid.Row="1"
+            Padding="0,8"
+            BorderBrush="{DynamicResource MaterialDividerBrush}"
+            BorderThickness="0,1">
+            <ScrollViewer HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
+                <StackPanel Orientation="Vertical">
+                    <!--  Theme  -->
+                    <DockPanel
+                        Margin="16,8"
+                        LastChildFill="False"
+                        ToolTip.Tip="Preferred user interface theme">
+                        <TextBlock DockPanel.Dock="Left" Text="Theme" />
+                        <ComboBox
+                            Width="150"
+                            DockPanel.Dock="Right"
+                            ItemsSource="{Binding AvailableThemes}"
+                            SelectedItem="{Binding Theme}" />
+                    </DockPanel>
+
+                    <!--  Auto-updates  -->
+                    <DockPanel
+                        Margin="16,8"
+                        IsVisible="{OnPlatform False,
+                                               Windows=True}"
+                        LastChildFill="False">
+                        <ToolTip.Tip>
+                            <TextBlock>
+                                <Run Text="Perform automatic updates on every launch." />
+                                <LineBreak />
+                                <Run FontWeight="SemiBold" Text="Warning:" />
+                                <Run Text="it's recommended to leave this option enabled to ensure that the app" />
+                                <LineBreak />
+                                <Run Text=" " />
+                                <Run Text="is compatible with the latest version of YouTube." />
+                            </TextBlock>
+                        </ToolTip.Tip>
+                        <TextBlock DockPanel.Dock="Left" Text="Auto-update" />
+                        <ToggleSwitch DockPanel.Dock="Right" IsChecked="{Binding IsAutoUpdateEnabled}" />
+                    </DockPanel>
+
+                    <!--  Inject tags  -->
+                    <DockPanel
+                        Margin="16,8"
+                        LastChildFill="False"
+                        ToolTip.Tip="Inject media tags into downloaded files">
+                        <TextBlock DockPanel.Dock="Left" Text="Inject media tags" />
+                        <ToggleSwitch DockPanel.Dock="Right" IsChecked="{Binding ShouldInjectTags}" />
+                    </DockPanel>
+
+                    <!--  Skip existing files  -->
+                    <DockPanel
+                        Margin="16,8"
+                        LastChildFill="False"
+                        ToolTip.Tip="When downloading multiple tracks, skip those that already have matching files in the output directory">
+                        <TextBlock DockPanel.Dock="Left" Text="Skip existing files" />
+                        <ToggleSwitch DockPanel.Dock="Right" IsChecked="{Binding ShouldSkipExistingFiles}" />
+                    </DockPanel>
+
+                    <!--  File name template  -->
+                    <DockPanel Margin="16,8" LastChildFill="False">
+                        <ToolTip.Tip>
+                            <TextBlock>
+                                <Run Text="Template used for generating file names for downloaded tracks." />
+                                <LineBreak />
+                                <LineBreak />
+                                <Run Text="Available tokens:" />
+                                <LineBreak />
+                                <Run Text=" " />
+                                <Run FontWeight="SemiBold" Text="$num" />
+                                <Run Text="— track's position in the list (if applicable)" />
+                                <LineBreak />
+                                <Run Text=" " />
+                                <Run FontWeight="SemiBold" Text="$id" />
+                                <Run Text="— track ID" />
+                                <LineBreak />
+                                <Run Text=" " />
+                                <Run FontWeight="SemiBold" Text="$title" />
+                                <Run Text="— track title" />
+                                <LineBreak />
+                                <Run Text=" " />
+                                <Run FontWeight="SemiBold" Text="$author" />
+                                <Run Text="— track author" />
+                            </TextBlock>
+                        </ToolTip.Tip>
+                        <TextBlock DockPanel.Dock="Left" Text="File name template" />
+                        <TextBox
+                            Width="150"
+                            Height="20"
+                            DockPanel.Dock="Right"
+                            FontSize="13"
+                            Text="{Binding FileNameTemplate}"
+                            Theme="{DynamicResource CompactTextBox}" />
+                    </DockPanel>
+
+                    <!--  Parallel limit  -->
+                    <DockPanel
+                        Margin="16,8"
+                        LastChildFill="False"
+                        ToolTip.Tip="How many downloads can be active at the same time">
+                        <TextBlock DockPanel.Dock="Left" Text="Parallel limit" />
+                        <StackPanel DockPanel.Dock="Right" Orientation="Horizontal">
+                            <TextBlock Margin="10,0" Text="{Binding ParallelLimit}" />
+                            <Slider
+                                Width="150"
+                                IsSnapToTickEnabled="True"
+                                Maximum="10"
+                                Minimum="1"
+                                TickFrequency="1"
+                                Value="{Binding ParallelLimit}" />
+                        </StackPanel>
+                    </DockPanel>
+                </StackPanel>
+            </ScrollViewer>
+        </Border>
+
+        <!--  Close button  -->
+        <Button
+            Grid.Row="2"
+            Margin="16"
+            HorizontalAlignment="Stretch"
+            Command="{Binding CloseCommand}"
+            Content="CLOSE"
+            IsCancel="True"
+            IsDefault="True"
+            Theme="{DynamicResource MaterialOutlineButton}" />
+    </Grid>
+</UserControl>

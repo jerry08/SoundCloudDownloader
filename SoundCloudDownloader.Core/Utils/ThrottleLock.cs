@@ -4,14 +4,10 @@ using System.Threading.Tasks;
 
 namespace SoundCloudDownloader.Core.Utils;
 
-internal class ThrottleLock : IDisposable
+public class ThrottleLock(TimeSpan interval) : IDisposable
 {
     private readonly SemaphoreSlim _semaphore = new(1, 1);
-    private readonly TimeSpan _interval;
     private DateTimeOffset _lastRequestInstant = DateTimeOffset.MinValue;
-
-    public ThrottleLock(TimeSpan interval) =>
-        _interval = interval;
 
     public async Task WaitAsync(CancellationToken cancellationToken = default)
     {
@@ -21,7 +17,7 @@ internal class ThrottleLock : IDisposable
         {
             var timePassedSinceLastRequest = DateTimeOffset.Now - _lastRequestInstant;
 
-            var remainingTime = _interval - timePassedSinceLastRequest;
+            var remainingTime = interval - timePassedSinceLastRequest;
             if (remainingTime > TimeSpan.Zero)
                 await Task.Delay(remainingTime, cancellationToken);
 

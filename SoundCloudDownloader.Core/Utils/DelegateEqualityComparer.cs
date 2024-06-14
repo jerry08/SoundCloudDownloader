@@ -3,26 +3,22 @@ using System.Collections.Generic;
 
 namespace SoundCloudDownloader.Core.Utils;
 
-internal class DelegateEqualityComparer<T> : IEqualityComparer<T>
+internal class DelegateEqualityComparer<T>(Func<T, T, bool> equals, Func<T, int> getHashCode)
+    : IEqualityComparer<T>
 {
-    private readonly Func<T, T, bool> _equals;
-    private readonly Func<T, int> _getHashCode;
-
-    public DelegateEqualityComparer(Func<T, T, bool> equals, Func<T, int> getHashCode)
-    {
-        _equals = equals;
-        _getHashCode = getHashCode;
-    }
-
     public bool Equals(T? x, T? y)
     {
-        if (ReferenceEquals(x, y)) return true;
-        if (ReferenceEquals(x, null)) return false;
-        if (ReferenceEquals(y, null)) return false;
-        if (x.GetType() != y.GetType()) return false;
+        if (ReferenceEquals(x, y))
+            return true;
+        if (ReferenceEquals(x, null))
+            return false;
+        if (ReferenceEquals(y, null))
+            return false;
+        if (x.GetType() != y.GetType())
+            return false;
 
-        return _equals(x, y);
+        return equals(x, y);
     }
 
-    public int GetHashCode(T obj) => _getHashCode(obj);
+    public int GetHashCode(T obj) => getHashCode(obj);
 }

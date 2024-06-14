@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
+using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
 using Gress;
@@ -16,7 +18,8 @@ public class TrackDownloader
         string filePath,
         Track track,
         IProgress<Percentage>? progress = null,
-        CancellationToken cancellationToken = default)
+        CancellationToken cancellationToken = default
+    )
     {
         var dirPath = Path.GetDirectoryName(filePath);
         if (!string.IsNullOrWhiteSpace(dirPath))

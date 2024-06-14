@@ -1,157 +1,172 @@
 ﻿using System;
+using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
 using Gress;
 using Gress.Completable;
 using SoundCloudDownloader.Core.Downloading;
 using SoundCloudDownloader.Core.Resolving;
 using SoundCloudDownloader.Core.Tagging;
+using SoundCloudDownloader.Framework;
 using SoundCloudDownloader.Services;
 using SoundCloudDownloader.Utils;
-using SoundCloudDownloader.ViewModels.Dialogs;
-using SoundCloudDownloader.ViewModels.Framework;
+using SoundCloudDownloader.Utils.Extensions;
 using SoundCloudExplode.Exceptions;
-using Stylet;
 
 namespace SoundCloudDownloader.ViewModels.Components;
 
-public class DashboardViewModel : PropertyChangedBase
+public partial class DashboardViewModel : ViewModelBase
 {
-    private readonly IViewModelFactory _viewModelFactory;
+    private readonly ViewModelManager _viewModelManager;
     private readonly DialogManager _dialogManager;
     private readonly SettingsService _settingsService;
 
-    private readonly AutoResetProgressMuxer _progressMuxer;
+    private readonly DisposableCollector _eventRoot = new();
     private readonly ResizableSemaphore _downloadSemaphore = new();
+    private readonly AutoResetProgressMuxer _progressMuxer;
 
-    private readonly QueryResolver _queryResolver = new();
-    private readonly TrackDownloader _trackDownloader = new();
-    private readonly MediaTagInjector _mediaTagInjector = new();
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(IsProgressIndeterminate))]
+    [NotifyCanExecuteChangedFor(nameof(ProcessQueryCommand))]
+    [NotifyCanExecuteChangedFor(nameof(ShowSettingsCommand))]
+    private bool _isBusy;
 
-    public bool IsBusy { get; private set; }
-
-    public ProgressContainer<Percentage> Progress { get; } = new();
-
-    public bool IsProgressIndeterminate => IsBusy && Progress.Current.Fraction is <= 0 or >= 1;
-
-    public string? Query { get; set; }
-
-    public BindableCollection<DownloadViewModel> Downloads { get; } = new();
-
-    public bool IsDownloadsAvailable => Downloads.Any();
+    [ObservableProperty]
+    [NotifyCanExecuteChangedFor(nameof(ProcessQueryCommand))]
+    private string? _query;
 
     public DashboardViewModel(
-        IViewModelFactory viewModelFactory,
+        ViewModelManager viewModelManager,
         DialogManager dialogManager,
-        SettingsService settingsService)
+        SettingsService settingsService
+    )
     {
-        _viewModelFactory = viewModelFactory;
+        _viewModelManager = viewModelManager;
         _dialogManager = dialogManager;
         _settingsService = settingsService;
 
         _progressMuxer = Progress.CreateMuxer().WithAutoReset();
 
-        _settingsService.BindAndInvoke(o => o.ParallelLimit, (_, e) => _downloadSemaphore.MaxCount = e.NewValue);
-        Progress.Bind(o => o.Current, (_, _) => NotifyOfPropertyChange(() => IsProgressIndeterminate));
-        Downloads.Bind(o => o.Count, (_, _) => NotifyOfPropertyChange(() => IsDownloadsAvailable));
+        _eventRoot.Add(
+            _settingsService.WatchProperty(
+                o => o.ParallelLimit,
+                () => _downloadSemaphore.MaxCount = _settingsService.ParallelLimit
+            )
+        );
+
+        _eventRoot.Add(
+            Progress.WatchProperty(
+                o => o.Current,
+                () => OnPropertyChanged(nameof(IsProgressIndeterminate))
+            )
+        );
     }
 
-    public bool CanShowSettings => !IsBusy;
+    public ProgressContainer<Percentage> Progress { get; } = new();
 
-    public async void ShowSettings() => await _dialogManager.ShowDialogAsync(
-        _viewModelFactory.CreateSettingsViewModel()
-    );
+    public ObservableCollection<DownloadViewModel> Downloads { get; } = [];
 
-    private void EnqueueDownload(DownloadViewModel download, int position = 0)
+    public bool IsProgressIndeterminate => IsBusy && Progress.Current.Fraction is <= 0 or >= 1;
+
+    private bool CanShowSettings() => !IsBusy;
+
+    [RelayCommand(CanExecute = nameof(CanShowSettings))]
+    private async Task ShowSettingsAsync() =>
+        await _dialogManager.ShowDialogAsync(_viewModelManager.CreateSettingsViewModel());
+
+    private async void EnqueueDownload(DownloadViewModel download, int position = 0)
     {
+        Downloads.Insert(position, download);
         var progress = _progressMuxer.CreateInput();
 
-        Task.Run(async () =>
+        try
         {
-            try
-            {
-                using var access = await _downloadSemaphore.AcquireAsync(download.CancellationToken);
+            var downloader = new TrackDownloader();
+            var tagInjector = new MediaTagInjector();
 
-                download.Status = DownloadStatus.Started;
+            using var access = await _downloadSemaphore.AcquireAsync(download.CancellationToken);
 
-                await _trackDownloader.DownloadAsync(
-                    download.FilePath!,
-                    download.Track!,
-                    download.Progress.Merge(progress),
-                    download.CancellationToken
-                );
+            download.Status = DownloadStatus.Started;
 
-                if (_settingsService.ShouldInjectTags)
-                {
-                    try
-                    {
-                        await _mediaTagInjector.InjectTagsAsync(
-                            download.FilePath!,
-                            download.Track!,
-                            download.CancellationToken
-                        );
-                    }
-                    catch
-                    {
-                        // Media tagging is not critical
-                    }
-                }
+            await downloader.DownloadAsync(
+                download.FilePath!,
+                download.Track!,
+                download.Progress.Merge(progress),
+                download.CancellationToken
+            );
 
-                download.Status = DownloadStatus.Completed;
-            }
-            catch (Exception ex)
+            if (_settingsService.ShouldInjectTags)
             {
                 try
                 {
-                    // Delete incompletely downloaded file
-                    File.Delete(download.FilePath!);
+                    await tagInjector.InjectTagsAsync(
+                        download.FilePath!,
+                        download.Track!,
+                        download.CancellationToken
+                    );
                 }
                 catch
                 {
-                    // Ignore
+                    // Media tagging is not critical
                 }
-
-                download.Status = ex is OperationCanceledException
-                    ? DownloadStatus.Canceled
-                    : DownloadStatus.Failed;
-
-                // Short error message for SoundCloud-related errors, full for others
-                download.ErrorMessage = ex is SoundcloudExplodeException
-                    ? ex.Message
-                    : ex.ToString();
             }
-            finally
+
+            download.Status = DownloadStatus.Completed;
+        }
+        catch (Exception ex)
+        {
+            try
             {
-                progress.ReportCompletion();
-                download.Dispose();
+                // Delete the incompletely downloaded file
+                if (!string.IsNullOrWhiteSpace(download.FilePath))
+                    File.Delete(download.FilePath);
             }
-        });
+            catch
+            {
+                // Ignore
+            }
 
-        Downloads.Insert(position, download);
+            download.Status =
+                ex is OperationCanceledException ? DownloadStatus.Canceled : DownloadStatus.Failed;
+
+            // Short error message for YouTube-related errors, full for others
+            download.ErrorMessage = ex is SoundcloudExplodeException ? ex.Message : ex.ToString();
+        }
+        finally
+        {
+            progress.ReportCompletion();
+            download.Dispose();
+        }
     }
 
-    public bool CanProcessQuery => !IsBusy && !string.IsNullOrWhiteSpace(Query);
+    private bool CanProcessQuery() => !IsBusy && !string.IsNullOrWhiteSpace(Query);
 
-    public async void ProcessQuery()
+    [RelayCommand(CanExecute = nameof(CanProcessQuery))]
+    private async Task ProcessQueryAsync()
     {
         if (string.IsNullOrWhiteSpace(Query))
             return;
 
         IsBusy = true;
 
-        // Small weight to not offset any existing download operations
+        // Small weight so as to not offset any existing download operations
         var progress = _progressMuxer.CreateInput(0.01);
 
         try
         {
-            var result = await _queryResolver.ResolveAsync(
-                Query.Split("\n", StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries),
+            var resolver = new QueryResolver();
+            var downloader = new TrackDownloader();
+
+            var result = await resolver.ResolveAsync(
+                Query.Split(
+                    "\n",
+                    StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries
+                ),
                 progress
             );
-
-            foreach (var track in result.Tracks)
-                track.ArtworkUrl ??= track.User?.AvatarUrl;
 
             // Single track
             if (result.Tracks.Count == 1)
@@ -159,7 +174,7 @@ public class DashboardViewModel : PropertyChangedBase
                 var track = result.Tracks.Single();
 
                 var download = await _dialogManager.ShowDialogAsync(
-                    _viewModelFactory.CreateDownloadSingleSetupViewModel(track)
+                    _viewModelManager.CreateDownloadSingleSetupViewModel(track)
                 );
 
                 if (download is null)
@@ -171,10 +186,13 @@ public class DashboardViewModel : PropertyChangedBase
             else if (result.Tracks.Count > 1)
             {
                 var downloads = await _dialogManager.ShowDialogAsync(
-                    _viewModelFactory.CreateDownloadMultipleSetupViewModel(
+                    _viewModelManager.CreateDownloadMultipleSetupViewModel(
                         result.Title,
                         result.Tracks,
-                        result.Kind is not QueryResultKind.Search and not QueryResultKind.Aggregate
+                        // Pre-select tracks if they come from a single query and not from search
+                        result.Kind
+                            is not QueryResultKind.Search
+                                and not QueryResultKind.Aggregate
                     )
                 );
 
@@ -188,7 +206,7 @@ public class DashboardViewModel : PropertyChangedBase
             else
             {
                 await _dialogManager.ShowDialogAsync(
-                    _viewModelFactory.CreateMessageBoxViewModel(
+                    _viewModelManager.CreateMessageBoxViewModel(
                         "Nothing found",
                         "Couldn't find any tracks based on the query or URL you provided"
                     )
@@ -198,9 +216,9 @@ public class DashboardViewModel : PropertyChangedBase
         catch (Exception ex)
         {
             await _dialogManager.ShowDialogAsync(
-                _viewModelFactory.CreateMessageBoxViewModel(
+                _viewModelManager.CreateMessageBoxViewModel(
                     "Error",
-                    // Short error message for SoundCloud-related errors, full for others
+                    // Short error message for YouTube-related errors, full for others
                     ex is SoundcloudExplodeException
                         ? ex.Message
                         : ex.ToString()
@@ -214,14 +232,15 @@ public class DashboardViewModel : PropertyChangedBase
         }
     }
 
-    public void RemoveDownload(DownloadViewModel download)
+    private void RemoveDownload(DownloadViewModel download)
     {
         Downloads.Remove(download);
-        download.Cancel();
+        download.CancelCommand.Execute(null);
         download.Dispose();
     }
 
-    public void RemoveSuccessfulDownloads()
+    [RelayCommand]
+    private void RemoveSuccessfulDownloads()
     {
         foreach (var download in Downloads.ToArray())
         {
@@ -230,29 +249,37 @@ public class DashboardViewModel : PropertyChangedBase
         }
     }
 
-    public void RemoveInactiveDownloads()
+    [RelayCommand]
+    private void RemoveInactiveDownloads()
     {
         foreach (var download in Downloads.ToArray())
         {
-            if (download.Status is DownloadStatus.Completed or DownloadStatus.Failed or DownloadStatus.Canceled)
+            if (
+                download.Status
+                is DownloadStatus.Completed
+                    or DownloadStatus.Failed
+                    or DownloadStatus.Canceled
+            )
                 RemoveDownload(download);
         }
     }
 
-    public void RestartDownload(DownloadViewModel download)
+    [RelayCommand]
+    private void RestartDownload(DownloadViewModel download)
     {
         var position = Math.Max(0, Downloads.IndexOf(download));
         RemoveDownload(download);
 
-        var newDownload = _viewModelFactory.CreateDownloadViewModel(
-                download.Track!,
-                download.FilePath!
-            );
+        var newDownload = _viewModelManager.CreateDownloadViewModel(
+            download.Track!,
+            download.FilePath!
+        );
 
         EnqueueDownload(newDownload, position);
     }
 
-    public void RestartFailedDownloads()
+    [RelayCommand]
+    private void RestartFailedDownloads()
     {
         foreach (var download in Downloads.ToArray())
         {
@@ -261,9 +288,23 @@ public class DashboardViewModel : PropertyChangedBase
         }
     }
 
-    public void CancelAllDownloads()
+    [RelayCommand]
+    private void CancelAllDownloads()
     {
         foreach (var download in Downloads)
-            download.Cancel();
+            download.CancelCommand.Execute(null);
+    }
+
+    protected override void Dispose(bool disposing)
+    {
+        if (disposing)
+        {
+            CancelAllDownloads();
+
+            _eventRoot.Dispose();
+            _downloadSemaphore.Dispose();
+        }
+
+        base.Dispose(disposing);
     }
 }

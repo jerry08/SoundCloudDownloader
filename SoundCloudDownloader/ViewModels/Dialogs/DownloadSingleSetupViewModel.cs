@@ -1,64 +1,62 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Windows;
+using System.Threading.Tasks;
+using Avalonia;
+using Avalonia.Platform.Storage;
+using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
 using SoundCloudDownloader.Core.Downloading;
+using SoundCloudDownloader.Framework;
 using SoundCloudDownloader.Services;
 using SoundCloudDownloader.Utils;
+using SoundCloudDownloader.Utils.Extensions;
 using SoundCloudDownloader.ViewModels.Components;
-using SoundCloudDownloader.ViewModels.Framework;
 using SoundCloudExplode.Tracks;
 
 namespace SoundCloudDownloader.ViewModels.Dialogs;
 
-public class DownloadSingleSetupViewModel : DialogScreen<DownloadViewModel>
+public partial class DownloadSingleSetupViewModel(
+    ViewModelManager viewModelManager,
+    DialogManager dialogManager,
+    SettingsService settingsService
+) : DialogViewModelBase<DownloadViewModel>
 {
-    private readonly IViewModelFactory _viewModelFactory;
-    private readonly DialogManager _dialogManager;
-    private readonly SettingsService _settingsService;
+    [ObservableProperty]
+    private Track? _track;
 
-    public Track? Track { get; set; }
+    [ObservableProperty]
+    IReadOnlyList<string>? _availableDownloadOptions = ["Mp3"];
 
-    public IReadOnlyList<string>? AvailableDownloadOptions { get; set; } = new[]
-    {
-        "mp3",
-        //"m4a",
-        //"ogg"
-    };
+    [ObservableProperty]
+    string? _selectedDownloadOption;
 
-    public string? SelectedDownloadOption { get; set; }
-
-    public DownloadSingleSetupViewModel(
-        IViewModelFactory viewModelFactory,
-        DialogManager dialogManager,
-        SettingsService settingsService)
-    {
-        _viewModelFactory = viewModelFactory;
-        _dialogManager = dialogManager;
-        _settingsService = settingsService;
-    }
-
-    public void OnViewLoaded()
+    [RelayCommand]
+    private void Initialize()
     {
         SelectedDownloadOption = AvailableDownloadOptions?.FirstOrDefault(o =>
-            o == _settingsService.LastContainer
+            o == settingsService.LastContainer
         );
     }
 
-    public void CopyTitle() => Clipboard.SetText(Track!.Title);
-
-    public void Confirm()
+    [RelayCommand]
+    private async Task CopyTitleAsync()
     {
-        var container = SelectedDownloadOption!;
+        if (Application.Current?.ApplicationLifetime?.TryGetTopLevel()?.Clipboard is { } clipboard)
+            await clipboard.SetTextAsync(Track?.Title);
+    }
 
-        var filePath = _dialogManager.PromptSaveFilePath(
-            $"{container} file|*.{container}",
-            FileNameTemplate.Apply(
-                _settingsService.FileNameTemplate,
-                Track!,
-                container
-            )
+    [RelayCommand]
+    private async Task ConfirmAsync()
+    {
+        if (Track is null || SelectedDownloadOption is null)
+            return;
+
+        var container = SelectedDownloadOption;
+
+        var filePath = await dialogManager.PromptSaveFilePathAsync(
+            [new FilePickerFileType($"{container} file") { Patterns = [$"*.{container}"] }],
+            FileNameTemplate.Apply(settingsService.FileNameTemplate, Track, container)
         );
 
         if (string.IsNullOrWhiteSpace(filePath))
@@ -66,26 +64,10 @@ public class DownloadSingleSetupViewModel : DialogScreen<DownloadViewModel>
 
         // Download does not start immediately, so lock in the file path to avoid conflicts
         DirectoryEx.CreateDirectoryForFile(filePath);
-        File.WriteAllBytes(filePath, Array.Empty<byte>());
+        await File.WriteAllBytesAsync(filePath, []);
 
-        _settingsService.LastContainer = container;
+        settingsService.LastContainer = container;
 
-        Close(
-            _viewModelFactory.CreateDownloadViewModel(Track!, filePath)
-        );
-    }
-}
-
-public static class DownloadSingleSetupViewModelExtensions
-{
-    public static DownloadSingleSetupViewModel CreateDownloadSingleSetupViewModel(
-        this IViewModelFactory factory,
-        Track track)
-    {
-        var viewModel = factory.CreateDownloadSingleSetupViewModel();
-
-        viewModel.Track = track;
-
-        return viewModel;
+        Close(viewModelManager.CreateDownloadViewModel(Track, filePath));
     }
 }

@@ -11,31 +11,23 @@ internal partial class MediaFile : IDisposable
     public MediaFile(TagFile file) => _file = file;
 
     public void SetThumbnail(byte[] thumbnailData) =>
-        _file.Tag.Pictures = new IPicture[] { new Picture(thumbnailData) };
+        _file.Tag.Pictures = [new Picture(thumbnailData)];
 
-    public void SetArtist(string artist) =>
-        _file.Tag.Performers = new[] { artist };
+    public void SetArtist(string artist) => _file.Tag.Performers = [artist];
 
-    public void SetArtistSort(string artistSort) =>
-        _file.Tag.PerformersSort = new[] { artistSort };
+    public void SetArtistSort(string artistSort) => _file.Tag.PerformersSort = [artistSort];
 
-    public void SetTitle(string title) =>
-        _file.Tag.Title = title;
+    public void SetTitle(string title) => _file.Tag.Title = title;
 
-    public void SetPerformers(string[] performers) =>
-        _file.Tag.Performers = performers;
+    public void SetPerformers(string[] performers) => _file.Tag.Performers = performers;
 
-    public void SetAlbum(string album) =>
-        _file.Tag.Album = album;
+    public void SetAlbum(string album) => _file.Tag.Album = album;
 
-    public void SetGenre(string genre) =>
-        _file.Tag.Genres = new[] { genre };
+    public void SetGenre(string genre) => _file.Tag.Genres = [genre];
 
-    public void SetDescription(string description) =>
-        _file.Tag.Description = description;
+    public void SetDescription(string description) => _file.Tag.Description = description;
 
-    public void SetComment(string comment) =>
-        _file.Tag.Comment = comment;
+    public void SetComment(string comment) => _file.Tag.Comment = comment;
 
     public void Dispose()
     {

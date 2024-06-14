@@ -2,7 +2,7 @@
 
 namespace SoundCloudDownloader.Core.Utils.Extensions;
 
-internal static class CollectionExtensions
+public static class CollectionExtensions
 {
     public static void AddRange<T>(this ICollection<T> source, IEnumerable<T> items)
     {

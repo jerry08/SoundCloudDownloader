@@ -8,7 +8,7 @@ internal static class Memo
 {
     private static class ForValue<T>
     {
-        private static readonly ConditionalWeakTable<object, Dictionary<int, T>> CacheManifest = new();
+        private static readonly ConditionalWeakTable<object, Dictionary<int, T>> CacheManifest = [];
 
         public static Dictionary<int, T> GetCacheForOwner(object owner) =>
             CacheManifest.GetOrCreateValue(owner);

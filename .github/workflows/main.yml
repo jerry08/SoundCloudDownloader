@@ -10,80 +10,92 @@ env:
   DOTNET_CLI_TELEMETRY_OPTOUT: true
   
 jobs:
+  format:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    permissions:
+      contents: read
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 8.0.x
+
+      - name: Verify formatting
+        run: >
+          dotnet build
+          -t:CSharpierFormat
+          --configuration Release
+
   pack:
-    runs-on: windows-latest
+    strategy:
+      matrix:
+        rid:
+          - win-arm64
+          - win-x86
+          - win-x64
+          - linux-x64
+          - osx-arm64
+          - osx-x64
+
+    runs-on: ${{ startsWith(matrix.rid, 'win-') && 'windows-latest' || startsWith(matrix.rid, 'osx-') && 'macos-latest' || 'ubuntu-latest' }}
+    timeout-minutes: 10
+
     permissions:
       actions: write
       contents: read
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Install .NET
-        uses: actions/setup-dotnet@v3
+        uses: actions/setup-dotnet@v4
         with:
           dotnet-version: 8.0.x
 
       - name: Publish app
         run: >
           dotnet publish SoundCloudDownloader
+          -p:Version=${{ github.ref_type == 'tag' && github.ref_name || format('999.9.9-ci-{0}', github.sha) }}
+          -p:CSharpier_Bypass=true
           --output SoundCloudDownloader/bin/publish
           --configuration Release
+          --runtime ${{ matrix.rid }}
+          --self-contained
 
       - name: Upload artifacts
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
-          name: SoundCloudDownloader
+          name: SoundCloudDownloader.${{ matrix.rid }}
           path: SoundCloudDownloader/bin/publish
           if-no-files-found: error
 
-  deploy:
-    if: ${{ github.event_name == 'push' && github.ref_type == 'tag' }}
-    needs: pack
+  release:
+    if: ${{ github.ref_type == 'tag' }}
+
+    needs:
+      - format
+      - pack
+
     runs-on: ubuntu-latest
+    timeout-minutes: 10
+
     permissions:
-      actions: read
       contents: write
 
     steps:
-      - name: Checkout
-        uses: actions/checkout@v3
-        
-      - name: Set version and package name
-        run: |
-          TAG_NAME="${{ github.ref_name }}"
-          echo $TAG_NAME
-          VERSION="$(echo $TAG_NAME | tr -d v)"
-          echo "VERSION=$VERSION" >> $GITHUB_ENV
-          echo "PACKAGE_NAME=${{ github.event.repository.name }}-$TAG_NAME.apk" >> $GITHUB_ENV
-          
-      - name: Set body
-        run: |
-          git fetch --depth=1 origin +refs/tags/*:refs/tags/*
-          TAG_MESSAGE=$(git tag -l --format='%(contents)' ${GITHUB_REF#refs/*/})
-          echo "TAG_MESSAGE<<EOF" >> $GITHUB_ENV
-          echo "$TAG_MESSAGE" >> $GITHUB_ENV
-          echo "EOF" >> $GITHUB_ENV
-          
-      - name: Download artifacts
-        uses: actions/download-artifact@v3
-        with:
-          name: SoundCloudDownloader
-          path: SoundCloudDownloader/
-
-      - name: Create package
-        # Change into the artifacts directory to avoid including the directory itself in the zip archive
-        working-directory: SoundCloudDownloader/
-        run: zip -r ../SoundCloudDownloader.zip .
-
       - name: Create release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: >
           gh release create ${{ github.ref_name }}
-          SoundCloudDownloader.zip
           --repo ${{ github.event.repository.full_name }}
-          --title "${{ env.VERSION }}"
-          --notes "${{ env.TAG_MESSAGE }}"
+          --title ${{ github.ref_name }}
+          --generate-notes
           --verify-tag

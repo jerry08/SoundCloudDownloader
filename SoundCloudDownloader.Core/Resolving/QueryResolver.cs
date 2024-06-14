@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
 using Gress;
@@ -16,34 +17,51 @@ public class QueryResolver
 
     public async Task<QueryResult> ResolveAsync(
         string query,
-        CancellationToken cancellationToken = default)
+        CancellationToken cancellationToken = default
+    )
     {
         // Playlist/Album
-        if (await _soundcloud.Playlists.IsUrlValidAsync(query))
+        if (await _soundcloud.Playlists.IsUrlValidAsync(query, cancellationToken))
         {
             var playlist = await _soundcloud.Playlists.GetAsync(query, false, cancellationToken);
             var tracks = await _soundcloud.Playlists.GetTracksAsync(query, cancellationToken);
-            return new QueryResult(QueryResultKind.Playlist, $"Playlist: {playlist!.Title}", tracks);
+
+            foreach (var track in tracks)
+                track.ArtworkUrl ??= track.User?.AvatarUrl;
+
+            return new QueryResult(
+                QueryResultKind.Playlist,
+                $"Playlist: {playlist!.Title}",
+                tracks
+            );
         }
 
         // Track
-        if (await _soundcloud.Tracks.IsUrlValidAsync(query))
+        if (await _soundcloud.Tracks.IsUrlValidAsync(query, cancellationToken))
         {
             var track = await _soundcloud.Tracks.GetAsync(query, cancellationToken);
-            return new QueryResult(QueryResultKind.Track, track!.Title!, new[] { track });
+            track!.ArtworkUrl ??= track.User?.AvatarUrl;
+            return new QueryResult(QueryResultKind.Track, track!.Title!, [track]);
         }
 
         // Search
         {
-            var tracks = await _soundcloud.Search.GetTracksAsync(query, 0, 50, cancellationToken);
-            return new QueryResult(QueryResultKind.Track, "Tracks", tracks);
+            var tracks = await _soundcloud
+                .Search.GetTracksAsync(query, cancellationToken)
+                .CollectAsync(100);
+
+            foreach (var track in tracks)
+                track.ArtworkUrl ??= track.User?.AvatarUrl;
+
+            return new QueryResult(QueryResultKind.Search, "Tracks", tracks);
         }
     }
 
     public async Task<QueryResult> ResolveAsync(
         IReadOnlyList<string> queries,
         IProgress<Percentage>? progress = null,
-        CancellationToken cancellationToken = default)
+        CancellationToken cancellationToken = default
+    )
     {
         if (queries.Count == 1)
             return await ResolveAsync(queries.Single(), cancellationToken);
@@ -58,12 +76,11 @@ public class QueryResolver
 
             foreach (var track in result.Tracks)
             {
+                track.ArtworkUrl ??= track.User?.AvatarUrl;
                 tracks.Add(track);
             }
 
-            progress?.Report(
-                Percentage.FromFraction(1.0 * ++completed / queries.Count)
-            );
+            progress?.Report(Percentage.FromFraction(1.0 * ++completed / queries.Count));
         }
 
         return new QueryResult(QueryResultKind.Aggregate, $"{queries.Count} queries", tracks);

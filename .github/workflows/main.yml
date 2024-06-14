@@ -99,3 +99,43 @@ jobs:
           --title ${{ github.ref_name }}
           --generate-notes
           --verify-tag
+
+  deploy:
+    needs: release
+
+    strategy:
+      matrix:
+        rid:
+          - win-arm64
+          - win-x86
+          - win-x64
+          - linux-x64
+          - osx-arm64
+          - osx-x64
+
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    permissions:
+      actions: read
+      contents: write
+
+    steps:
+      - name: Download artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: SoundCloudDownloader.${{ matrix.rid }}
+          path: SoundCloudDownloader/
+
+      - name: Create package
+        # Change into the artifacts directory to avoid including the directory itself in the zip archive
+        working-directory: SoundCloudDownloader/
+        run: zip -r ../SoundCloudDownloader.${{ matrix.rid }}.zip .
+
+      - name: Upload release asset
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: >
+          gh release upload ${{ github.ref_name }}
+          SoundCloudDownloader.${{ matrix.rid }}.zip
+          --repo ${{ github.event.repository.full_name }}

@@ -67,7 +67,7 @@
                                 <Run Text="it's recommended to leave this option enabled to ensure that the app" />
                                 <LineBreak />
                                 <Run Text=" " />
-                                <Run Text="is compatible with the latest version of YouTube." />
+                                <Run Text="is compatible with the latest version of SoundCloud." />
                             </TextBlock>
                         </ToolTip.Tip>
                         <TextBlock DockPanel.Dock="Left" Text="Auto-update" />

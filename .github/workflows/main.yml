@@ -64,6 +64,7 @@ jobs:
           dotnet publish SoundCloudDownloader
           -p:Version=${{ github.ref_type == 'tag' && github.ref_name || format('999.9.9-ci-{0}', github.sha) }}
           -p:CSharpier_Bypass=true
+          -p:PublishSingleFile=true
           -p:PublishTrimmed=true
           -p:TrimMode=link
           -p:IncludeNativeLibrariesForSelfExtract=true

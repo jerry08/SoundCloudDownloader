@@ -3,10 +3,27 @@
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
     <ApplicationIcon>..\favicon.ico</ApplicationIcon>
+    <PublishTrimmed>true</PublishTrimmed>
+    <PublishSingleFile>true</PublishSingleFile>
     <ApplicationManifest>app.manifest</ApplicationManifest>
     <CopyOutputSymbolsToPublishDirectory>false</CopyOutputSymbolsToPublishDirectory>
     <BuiltInComInteropSupport>true</BuiltInComInteropSupport>
     <AvaloniaUseCompiledBindingsByDefault>true</AvaloniaUseCompiledBindingsByDefault>
+  </PropertyGroup>
+
+  <!--<PropertyGroup>
+    <IsAotSupported>false</IsAotSupported>
+    <IsAotSupported Condition="'$([System.Runtime.InteropServices.RuntimeInformation]::OSArchitecture)' == 'X64' OR '$([System.Runtime.InteropServices.RuntimeInformation]::OSArchitecture)' == 'ARM64'">true</IsAotSupported>
+  </PropertyGroup>-->
+
+  <PropertyGroup>
+    <IsAotSupported Condition="'$(RuntimeIdentifier)' == 'win-x64'">true</IsAotSupported>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="$(IsAotSupported) == true">
+    <PublishAot>true</PublishAot>
+    <PublishSingleFile>false</PublishSingleFile>
+    <!--<PublishAotUsingRuntimePack>true</PublishAotUsingRuntimePack>-->
   </PropertyGroup>
 
   <ItemGroup>
@@ -15,18 +32,18 @@
 
   <ItemGroup>
     <PackageReference Include="AsyncImageLoader.Avalonia" Version="3.2.1" />
-    <PackageReference Include="Avalonia" Version="11.0.10" />
-    <PackageReference Include="Avalonia.Controls.DataGrid" Version="11.0.10" />
-    <PackageReference Include="Avalonia.Desktop" Version="11.0.10" />
-    <PackageReference Include="Avalonia.Diagnostics" Version="11.0.10" Condition="'$(Configuration)' == 'Debug'" />
+    <PackageReference Include="Avalonia" Version="11.0.11" />
+    <PackageReference Include="Avalonia.Controls.DataGrid" Version="11.0.11" />
+    <PackageReference Include="Avalonia.Desktop" Version="11.0.11" />
+    <PackageReference Include="Avalonia.Diagnostics" Version="11.0.11" Condition="'$(Configuration)' == 'Debug'" />
     <PackageReference Include="Cogwheel" Version="2.1.0" />
     <PackageReference Include="CommunityToolkit.Mvvm" Version="8.2.2" />
     <PackageReference Include="CSharpier.MsBuild" Version="0.28.2" PrivateAssets="all" />
-    <PackageReference Include="DialogHost.Avalonia" Version="0.7.7" />
+    <PackageReference Include="DialogHost.Avalonia" Version="0.7.9" />
     <PackageReference Include="Gress" Version="2.1.1" />
     <PackageReference Include="Material.Avalonia" Version="3.6.0" />
     <PackageReference Include="Material.Avalonia.DataGrid" Version="3.6.0" />
-    <PackageReference Include="Material.Icons.Avalonia" Version="2.1.9" />
+    <PackageReference Include="Material.Icons.Avalonia" Version="2.1.10" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="8.0.0" />
     <PackageReference Include="Onova" Version="2.6.12" />
   </ItemGroup>

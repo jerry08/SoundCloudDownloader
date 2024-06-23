@@ -35,6 +35,18 @@ public class QueryResolver
             );
         }
 
+        // User likes
+        if (_soundcloud.Users.IsLikesUrlValid(query))
+        {
+            var user = await _soundcloud.Users.GetAsync(query, cancellationToken);
+            var tracks = await _soundcloud.Users.GetLikedTracksAsync(query, cancellationToken);
+
+            foreach (var track in tracks)
+                track.ArtworkUrl ??= track.User?.AvatarUrl;
+
+            return new QueryResult(QueryResultKind.Playlist, $"Likes By {user.Username}", tracks);
+        }
+
         // Track
         if (await _soundcloud.Tracks.IsUrlValidAsync(query, cancellationToken))
         {

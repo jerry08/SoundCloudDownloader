@@ -169,7 +169,7 @@ public partial class DashboardViewModel : ViewModelBase
             );
 
             // Single track
-            if (result.Tracks.Count == 1)
+            if (result.Tracks.Count == 1 && result.Tracks[0].Media is not null)
             {
                 var track = result.Tracks.Single();
 

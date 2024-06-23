@@ -78,20 +78,20 @@
                                     <materialIcons:MaterialIcon
                                         Width="16"
                                         Height="16"
-                                        Opacity="0.7"
-                                        FontWeight="Bold"
                                         VerticalAlignment="Center"
                                         BorderThickness="1"
-                                        Kind="PlayArrow" />
+                                        FontWeight="Bold"
+                                        Kind="PlayArrow"
+                                        Opacity="0.7" />
                                     <TextBlock
                                         Margin="2,0,0,0"
                                         Opacity="0.7"
                                         TextTrimming="CharacterEllipsis">
-                                        <Run Text="{Binding PlaybackCount, Converter={x:Static converters:IntToKiloFormatConverter.Instance}}" />
+                                        <Run Text="{Binding PlaybackCount, Converter={x:Static converters:IntToKiloFormatConverter.Instance}, Mode=OneWay}" />
                                         <Run Text=" • " />
-                                        <Run Text="{Binding Duration, Converter={x:Static converters:MillisecondsToHumanReadableFormatConverter.Instance}}" />
+                                        <Run Text="{Binding Duration, Converter={x:Static converters:MillisecondsToHumanReadableFormatConverter.Instance}, Mode=OneWay}" />
                                         <Run Text=" • " />
-                                        <Run Text="{Binding DisplayDate, Converter={x:Static converters:TimeSinceFormatConverter.Instance}}" />
+                                        <Run Text="{Binding DisplayDate, Converter={x:Static converters:TimeSinceFormatConverter.Instance}, Mode=OneWay}" />
                                     </TextBlock>
                                 </StackPanel>
                             </StackPanel>

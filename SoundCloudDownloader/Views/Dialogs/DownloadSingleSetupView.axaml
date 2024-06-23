@@ -58,11 +58,11 @@
                     Margin="2,0,0,0"
                     Opacity="0.7"
                     TextTrimming="CharacterEllipsis">
-                    <Run Text="{Binding Track.PlaybackCount, Converter={x:Static converters:IntToKiloFormatConverter.Instance}}" />
+                    <Run Text="{Binding Track.PlaybackCount, Converter={x:Static converters:IntToKiloFormatConverter.Instance}, Mode=OneWay}" />
                     <Run Text=" • " />
-                    <Run Text="{Binding Track.Duration, Converter={x:Static converters:MillisecondsToHumanReadableFormatConverter.Instance}}" />
+                    <Run Text="{Binding Track.Duration, Converter={x:Static converters:MillisecondsToHumanReadableFormatConverter.Instance}, Mode=OneWay}" />
                     <Run Text=" • " />
-                    <Run Text="{Binding Track.DisplayDate, Converter={x:Static converters:TimeSinceFormatConverter.Instance}}" />
+                    <Run Text="{Binding Track.DisplayDate, Converter={x:Static converters:TimeSinceFormatConverter.Instance}, Mode=OneWay}" />
                 </TextBlock>
             </StackPanel>
         </StackPanel>

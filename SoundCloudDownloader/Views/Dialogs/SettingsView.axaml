@@ -22,13 +22,11 @@
                 VerticalAlignment="Center"
                 Command="{Binding CloseCommand}"
                 CornerRadius="30"
-                Foreground="{DynamicResource MaterialDarkForegroundBrush}"
                 Opacity="0.7"
                 Theme="{DynamicResource MaterialFlatButton}">
                 <materialIcons:MaterialIcon
                     Width="24"
                     Height="24"
-                    Foreground="{DynamicResource MaterialLightForegroundBrush}"
                     Kind="Close" />
             </Button>
         </Grid>

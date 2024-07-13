@@ -24,6 +24,8 @@ public partial class DashboardViewModel : ViewModelBase
     private readonly DialogManager _dialogManager;
     private readonly SettingsService _settingsService;
 
+    private readonly QueryResolver _queryResolver = new();
+
     private readonly DisposableCollector _eventRoot = new();
     private readonly ResizableSemaphore _downloadSemaphore = new();
     private readonly AutoResetProgressMuxer _progressMuxer;
@@ -157,10 +159,9 @@ public partial class DashboardViewModel : ViewModelBase
 
         try
         {
-            var resolver = new QueryResolver();
             var downloader = new TrackDownloader();
 
-            var result = await resolver.ResolveAsync(
+            var result = await _queryResolver.ResolveAsync(
                 Query.Split(
                     "\n",
                     StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries

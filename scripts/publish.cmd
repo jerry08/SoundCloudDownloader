@@ -1,0 +1,2 @@
+dotnet publish ../SoundCloudDownloader -r win-x64 -c Release -o ../build -p:CSharpier_Bypass=true -p:DebugType=None -p:DebugSymbols=false -p:TrimMode=link -p:IncludeNativeLibrariesForSelfExtract=true --self-contained
+pause

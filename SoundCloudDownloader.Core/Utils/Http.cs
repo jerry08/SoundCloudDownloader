@@ -16,8 +16,8 @@ internal static class Http
                     new ProductInfoHeaderValue(
                         "SoundCloudDownloader",
                         typeof(Http).Assembly.GetName().Version?.ToString(3)
-                    )
-                }
-            }
+                    ),
+                },
+            },
         };
 }

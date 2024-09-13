@@ -20,7 +20,7 @@ public partial class ViewManager
             DownloadSingleSetupViewModel => new DownloadSingleSetupView(),
             MessageBoxViewModel => new MessageBoxView(),
             SettingsViewModel => new SettingsView(),
-            _ => null
+            _ => null,
         };
 
     public Control? TryBindView(ViewModelBase viewModel)

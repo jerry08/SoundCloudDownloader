@@ -9,6 +9,7 @@
     <Nullable>enable</Nullable>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <ILLinkTreatWarningsAsErrors>false</ILLinkTreatWarningsAsErrors>
+    <NoWarn>IL2104,IL3053,IL2036,MSB3073</NoWarn>
   </PropertyGroup>
 
 </Project>

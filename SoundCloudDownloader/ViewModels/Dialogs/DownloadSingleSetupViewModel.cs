@@ -26,7 +26,7 @@ public partial class DownloadSingleSetupViewModel(
     public partial Track? Track { get; set; }
 
     [ObservableProperty]
-    public partial IReadOnlyList<string>? AvailableDownloadOptions { get; set; } = ["Mp3"];
+    IReadOnlyList<string>? _availableDownloadOptions = ["Mp3"];
 
     [ObservableProperty]
     public partial string? SelectedDownloadOption { get; set; }

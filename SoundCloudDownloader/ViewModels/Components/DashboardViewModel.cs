@@ -87,7 +87,7 @@ public partial class DashboardViewModel : ViewModelBase
 
         try
         {
-            var downloader = new TrackDownloader();
+            var downloader = new TrackDownloader(_queryResolver.ClientId);
             var tagInjector = new MediaTagInjector();
 
             using var access = await _downloadSemaphore.AcquireAsync(download.CancellationToken);
@@ -160,8 +160,6 @@ public partial class DashboardViewModel : ViewModelBase
 
         try
         {
-            var downloader = new TrackDownloader();
-
             var result = await _queryResolver.ResolveAsync(
                 Query.Split(
                     "\n",

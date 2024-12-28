@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
 using Gress;
@@ -13,6 +14,8 @@ namespace SoundCloudDownloader.Core.Resolving;
 public class QueryResolver
 {
     private readonly SoundCloudClient _soundcloud = new();
+
+    public string ClientId => _soundcloud.ClientId;
 
     public async Task<QueryResult> ResolveAsync(
         string query,

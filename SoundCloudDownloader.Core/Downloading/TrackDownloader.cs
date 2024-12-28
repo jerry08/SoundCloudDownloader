@@ -8,9 +8,9 @@ using SoundCloudExplode.Tracks;
 
 namespace SoundCloudDownloader.Core.Downloading;
 
-public class TrackDownloader
+public class TrackDownloader(string? clientId)
 {
-    private readonly SoundCloudClient _soundcloud = new();
+    private readonly SoundCloudClient _soundcloud = new(clientId ?? string.Empty);
 
     public async Task DownloadAsync(
         string filePath,

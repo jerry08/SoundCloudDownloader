@@ -87,11 +87,13 @@ public class MediaTagInjector
         CancellationToken cancellationToken = default
     )
     {
-        using var mediaFile = MediaFile.Create(filePath);
+        using var mediaFile = MediaFile.Open(filePath);
 
         InjectMiscMetadata(mediaFile, track);
         //await InjectMusicMetadataAsync(mediaFile, track, cancellationToken);
         InjectTrackMetadata(mediaFile, track);
         await InjectThumbnailAsync(mediaFile, track, cancellationToken);
+
+        mediaFile.Save();
     }
 }

@@ -34,11 +34,11 @@ public partial class DashboardViewModel : ViewModelBase
     [NotifyPropertyChangedFor(nameof(IsProgressIndeterminate))]
     [NotifyCanExecuteChangedFor(nameof(ProcessQueryCommand))]
     [NotifyCanExecuteChangedFor(nameof(ShowSettingsCommand))]
-    private bool _isBusy;
+    public partial bool IsBusy { get; set; }
 
     [ObservableProperty]
     [NotifyCanExecuteChangedFor(nameof(ProcessQueryCommand))]
-    private string? _query;
+    public partial string? Query { get; set; }
 
     public DashboardViewModel(
         ViewModelManager viewModelManager,

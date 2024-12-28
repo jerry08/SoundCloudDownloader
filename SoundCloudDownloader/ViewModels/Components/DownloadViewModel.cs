@@ -24,22 +24,22 @@ public partial class DownloadViewModel : ViewModelBase
     private bool _isDisposed;
 
     [ObservableProperty]
-    private Track? _track;
+    public partial Track? Track { get; set; }
 
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(FileName))]
-    private string? _filePath;
+    public partial string? FilePath { get; set; }
 
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(IsCanceledOrFailed))]
     [NotifyCanExecuteChangedFor(nameof(CancelCommand))]
     [NotifyCanExecuteChangedFor(nameof(ShowFileCommand))]
     [NotifyCanExecuteChangedFor(nameof(OpenFileCommand))]
-    private DownloadStatus _status = DownloadStatus.Enqueued;
+    public partial DownloadStatus Status { get; set; } = DownloadStatus.Enqueued;
 
     [ObservableProperty]
     [NotifyCanExecuteChangedFor(nameof(CopyErrorMessageCommand))]
-    private string? _errorMessage;
+    public partial string? ErrorMessage { get; set; }
 
     public DownloadViewModel(ViewModelManager viewModelManager, DialogManager dialogManager)
     {

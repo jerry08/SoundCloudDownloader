@@ -23,13 +23,13 @@ public partial class DownloadSingleSetupViewModel(
 ) : DialogViewModelBase<DownloadViewModel>
 {
     [ObservableProperty]
-    private Track? _track;
+    public partial Track? Track { get; set; }
 
     [ObservableProperty]
-    IReadOnlyList<string>? _availableDownloadOptions = ["Mp3"];
+    public partial IReadOnlyList<string>? AvailableDownloadOptions { get; set; } = ["Mp3"];
 
     [ObservableProperty]
-    string? _selectedDownloadOption;
+    public partial string? SelectedDownloadOption { get; set; }
 
     [RelayCommand]
     private void Initialize()

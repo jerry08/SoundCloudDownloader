@@ -23,14 +23,13 @@ public partial class DownloadMultipleSetupViewModel(
 ) : DialogViewModelBase<IReadOnlyList<DownloadViewModel>>
 {
     [ObservableProperty]
-    private string? _title;
+    public partial string? Title { get; set; }
 
     [ObservableProperty]
-    private IReadOnlyList<Track>? _availableTracks;
+    public partial IReadOnlyList<Track>? AvailableTracks { get; set; }
 
     [ObservableProperty]
-    private string _selectedContainer = "Mp3";
-
+    public partial string SelectedContainer { get; set; } = "Mp3";
     public ObservableCollection<Track> SelectedTracks { get; } = [];
 
     public IReadOnlyList<string> AvailableContainers { get; } = ["Mp3"];

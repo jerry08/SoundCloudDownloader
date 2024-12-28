@@ -35,7 +35,7 @@ public partial class DownloadViewModel : ViewModelBase
     [NotifyCanExecuteChangedFor(nameof(CancelCommand))]
     [NotifyCanExecuteChangedFor(nameof(ShowFileCommand))]
     [NotifyCanExecuteChangedFor(nameof(OpenFileCommand))]
-    public partial DownloadStatus Status { get; set; }
+    public partial DownloadStatus Status { get; set; } = DownloadStatus.Enqueued;
 
     [ObservableProperty]
     [NotifyCanExecuteChangedFor(nameof(CopyErrorMessageCommand))]
@@ -45,8 +45,6 @@ public partial class DownloadViewModel : ViewModelBase
     {
         _viewModelManager = viewModelManager;
         _dialogManager = dialogManager;
-
-        Status = DownloadStatus.Enqueued;
 
         _eventRoot.Add(
             Progress.WatchProperty(

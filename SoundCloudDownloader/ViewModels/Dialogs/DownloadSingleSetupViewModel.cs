@@ -1,4 +1,4 @@
-﻿using System.Collections.ObjectModel;
+﻿using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
@@ -25,7 +25,8 @@ public partial class DownloadSingleSetupViewModel(
     [ObservableProperty]
     public partial Track? Track { get; set; }
 
-    public ObservableCollection<string> AvailableDownloadOptions { get; set; } = ["Mp3"];
+    [ObservableProperty]
+    public partial IReadOnlyList<string>? AvailableDownloadOptions { get; set; } = ["Mp3"];
 
     [ObservableProperty]
     public partial string? SelectedDownloadOption { get; set; }
@@ -33,7 +34,7 @@ public partial class DownloadSingleSetupViewModel(
     [RelayCommand]
     private void Initialize()
     {
-        SelectedDownloadOption = AvailableDownloadOptions.FirstOrDefault(o =>
+        SelectedDownloadOption = AvailableDownloadOptions?.FirstOrDefault(o =>
             o == settingsService.LastContainer
         );
     }

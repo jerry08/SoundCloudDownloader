@@ -29,8 +29,7 @@ public partial class DownloadMultipleSetupViewModel(
     public partial IReadOnlyList<Track>? AvailableTracks { get; set; }
 
     [ObservableProperty]
-    string _selectedContainer = "Mp3";
-
+    public partial string SelectedContainer { get; set; } = "Mp3";
     public ObservableCollection<Track> SelectedTracks { get; } = [];
 
     public IReadOnlyList<string> AvailableContainers { get; } = ["Mp3"];
